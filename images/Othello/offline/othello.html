@@ -4,13 +4,14 @@
   src="https://code.jquery.com/jquery-3.2.1.min.js"
   integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
   crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../online/styles/animate.css">
     <link href="style.css" type="text/css" rel="stylesheet">
     <script src="game.js" type="text/javascript"></script>
 </head>
-<body>
+<body class="animated fadeIn">
 <div id="options">
 <h1 id="title">Othello</h1>
-<button onclick="newgame();">New Game</button>
+<button id="newgame" onclick="newgame();">New Game</button>
 <div id="turndiv">
 <table id="turntable"><tr><td id="turncolor"><p id="turn">Turn</p></td></tr></table></div>
 </div>

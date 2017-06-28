@@ -432,6 +432,12 @@ body {width: 92%; margin: 0 auto} /* Center page without wrapper */
   -moz-transition: all 0.3s;
   transition: all 0.3s;
 }
+#online {
+	background: black;
+}
+#offline {
+	background: black;
+}
 .btn:hover{
   color: #ccc;
 }

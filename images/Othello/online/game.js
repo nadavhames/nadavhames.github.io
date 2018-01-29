@@ -43,6 +43,7 @@ function hostStart(){
 
 function join(){
     init();
+    console.log(peer);
     peer.on('open',function() {
     var dest = prompt("Opponents ID:");
     connect = peer.connect(dest, {

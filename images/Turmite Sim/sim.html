@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="./Styles/style.css">
+    <link rel="stylesheet" href="./Styles/animate.css">
+
+    <title>Turmite Sim</title>
+</head>
+
+<body onload="loadStates(); initGrid();">
+    <div class="animated rollIn">
+        <div class="container">
+            <div class="header clearfix">
+                <h3 class="text-muted">Turmite Simulator</h3>
+            </div>
+
+            <div class="jumbotron">
+                <canvas id="canvas" width="500" height="500"></canvas>
+                <div class="col-lg" id="select">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <button class="btn btn-outline-secondary" type="button" id="start" onclick="start();">Start</button>
+                        </div>
+                        <div class="input-group-prepend">
+                            <button class="btn btn-outline-secondary" type="button" id="clear" onclick="clearCanvas();">Clear</button>
+                        </div>
+                        <select class="custom-select" id="inputGroupSelect" onchange="getPreset();">
+                            <option value="1">Custom</option>
+                            <option value="2" selected>Spiral</option>
+                            <option value="3">Fibonacci</option>
+                            <option value="4">Snowflake</option>
+                            <option value="5">Texture</option>
+                            <option value="6">Frame</option>
+                            <option value="7">Semichaotic</option>
+                        </select>
+                        <div class="input-group-append">
+                            <input class="input-group-text" id="timeSteps"></input>
+                        </div>
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="Wh">ms/move</span>
+                        </div>
+                    </div>
+                    <div id="stateContainer"></div>
+                    <div id="addSub">
+                        <button type="button" class="btn btn-default btn-sm" id="add" onclick="addState();">
+                            <span>+</span>
+                        </button>
+                        <button type="button" class="btn btn-default btn-sm" id="sub" onclick="removeState();">
+                            <span>-</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row marketing">
+                <div class="col-lg-6">
+                    <h4>About</h4>
+                    <p>Welcome to my turmite sim!
+                        <br /> After taking EECS2001 at York University and learning about models of computation (including turing
+                        machines), I decided that it would be apt to try to make something that is both visually interesting
+                        and conveys some of the courses concepts. Feel free to try the available presets via the dropdown
+                        or make your own instructions.
+                        <br /> I hope you enjoy!
+                        <br /> For more information, click
+                        <a href="https://en.wikipedia.org/wiki/Turmite">here</a> or
+                        <a href="https://web.archive.org/web/20161023060939/http://vincentverheyen.com/node/40">here</a>.
+                        <br />
+                    </p>
+                </div>
+
+                <div class="col-lg-6">
+                    <h4>Guide</h4>
+                    <p>Turmites perform the following operations each timestep: turn on the spot, (by some multiple of 90°)
+                        change the color of the current square, and move forward one square in the direction it is facing.
+                        <br /> The direction to turn is one of L (90° left), R (90° right), N (no turn) and U (180° U-turn).
+                        <br /> This simulator uses the format of |SetColourTo|SetTurnto|GoToState| to tell the turmite where to
+                        go: Depending on current colour and state, the corresponding instruction is chosen.
+                        <br /> To add or remove states, use the '+' and '-' buttons.
+                        <br /> A more readable version of the table is available on wikipedia
+                        <a href="https://en.wikipedia.org/wiki/Turmite">here</a>
+                    </p>
+                </div>
+            </div>
+
+            <footer class="footer">
+                <p>&copy; 2018 Nadav Hames</p>
+            </footer>
+
+        </div>
+        <!-- /container -->
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4"
+        crossorigin="anonymous"></script>
+    <script src="./Styles/watch.js"></script>
+    <script src="./Styles/canvas-grid.js"></script>
+    <script src="./Styles/sim.js"></script>
+</body>
+
+</html>

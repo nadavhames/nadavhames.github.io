@@ -5,7 +5,7 @@ title = "Projects"
 no_header = true
 +++
 
-[Tavim]() - A music notation editor built with React, Redux, Typescript. SMuFL compliant. Under active development, demo coming soon.
+[Tavim](https://nadavhames.com/projects/) - A music notation editor built with React, Redux, Typescript. SMuFL compliant. Under active development, demo coming soon.
 
 [Algorithmics Animation Workshop](https://www.eecs.yorku.ca/~aaw/) - A development platform that aids in creating visualizations of algorithms and data structures for educational purposes. Hosted by the Dept. of Electrical Engineering and Computer Science at York University in Toronto. Built with d3.js, TypeScript, Webpack, Bootstrap, JQuery.
 

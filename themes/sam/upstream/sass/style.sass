@@ -1,6 +1,8 @@
 @import "vars"
 @import "mixins"
 
+$tile-bg: #39424E;
+
 *
     margin: 0
     padding: 0
@@ -46,6 +48,12 @@ ul
 p
     display: inline
     opacity: 0.8
+    animation: 1s ease 0s pulse 1;
+
+@for $i from 1 through 9
+  p
+    &:nth-child(#{$i})
+      animation-delay: $i * (1s / 18);
 
 a
     color: $links
@@ -199,6 +207,14 @@ hr
 	vertical-align: baseline
 	border-radius: 0.25em
 	background-color: #6b7178;
+	
+@keyframes pulse
+  0%
+    background: $tile-bg;
+  25% 
+    background: lighten($tile-bg, 10%);
+  50%
+    background: $tile-bg;
 
 @import "elements"
 

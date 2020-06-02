@@ -142,57 +142,57 @@ hr
 .note4,
 .note5,
 .note6
-  position: absolute;
-  animation: notes 4s infinite linear;
-  font-size: 35px;
-  opacity: 0;
+  position: absolute
+  animation: notes 4s infinite linear
+  font-size: 35px
+  opacity: 0
 
 
 .note1
-  top: 60px;
-  left: 0;
-  animation-delay: 0.5s;
+  top: 60px
+  left: 0
+  animation-delay: 0.5s
 
 
 .note2
-  top: 30px;
-  left: 30%;
+  top: 30px
+  left: 30%
   animation-delay: 1s;
 
 
 .note3
-  top: 90px;
-  left: 60%;
-  animation-delay: 1.5s;
+  top: 90px
+  left: 60%
+  animation-delay: 1.5s
 
 
 .note4
-  top: 40px;
-  left: 90%;
-  animation-delay: 2s;
+  top: 40px
+  left: 90%
+  animation-delay: 2s
   
 .note5
-  top: 63px;
-  left: 45%;
-  animation-delay: 1.1s;
+  top: 63px
+  left: 45%
+  animation-delay: 1.1s
   
 .note6
-  top: 60px;
-  left: 75%;
-  animation-delay: 1.1s;
+  top: 60px
+  left: 75%
+  animation-delay: 1.1s
 
 @keyframes notes
   0% 
-    transform: scale(1) translate(0, 0);
+    transform: scale(1) translate(0, 0)
     opacity: 0;
   50% 
     opacity: 1;
-    transform: scale(1.5) translate(50%, -50%);
+    transform: scale(1.5) translate(50%, -50%)
   80%
     opacity: 0;
-    transform: scale(1.5) translate(100%, -100%);
+    transform: scale(1.5) translate(100%, -100%)
   100%
-    transform: scale(1.5) translate(100%, -100%);
+    transform: scale(1.5) translate(100%, -100%)
     opacity: 0;
 
 .label
@@ -206,15 +206,89 @@ hr
 	white-space: nowrap
 	vertical-align: baseline
 	border-radius: 0.25em
-	background-color: #6b7178;
+	background-color: #6b7178
 	
 @keyframes pulse
   0%
-    background: $tile-bg;
+    background: $tile-bg
   25% 
-    background: lighten($tile-bg, 10%);
+    background: lighten($tile-bg, 10%)
   50%
-    background: $tile-bg;
+    background: $tile-bg
+    
+@keyframes timelinebackground
+	0%
+		background-position: 27% 0%;
+	50%
+		background-position: 74% 100%;
+	100%
+		background-position: 27% 0%;
+
+// Timeline
+.timeline
+	border-left: $line solid $color-primary
+	border-bottom-right-radius: $radius
+	border-top-right-radius: $radius  
+	background: linear-gradient(302deg, #444e5d, #667489)
+	color: fade(white, 80%)
+	// font-family: $font-text
+	margin: $spacing auto
+	letter-spacing: 0.5px 
+	position: relative
+	line-height: inherit
+	font-size: 1.03em  
+	padding: $spacing  
+	list-style: none
+	text-align: left 
+	font-weight: 100 
+	// max-width: 50%
+    animation: timelinebackground 30s ease infinite
+	h1
+		// font-family: $font-title
+		letter-spacing: 1.5px
+		font-weight: 100
+		font-size: 1.4em 
+	h2, h3
+		// font-family: $font-title
+		letter-spacing: 1.5px
+		font-weight: 400
+		font-size: 1.4em
+		margin: 0em !important
+	.event
+		line-height: 0.9 !important
+		list-style-type: none
+		border-bottom: 1.2px dashed lighten($tile-bg, 25%)
+		// padding-bottom: ($spacing * 0.5)
+		// margin-bottom: $spacing
+		margin-bottom: 35px;
+		position: relative
+		&:last-of-type
+			padding-bottom: 0
+			margin-bottom: 0 
+			border: none
+		&:before, &:after 
+			position: absolute
+			display: block
+			top: 4px
+		&:before 
+			left: ((($date * 0.6) + $spacing + $line + $dot + ($dotborder * 2)) * 1.5) * -1    
+			color: fade($color-light, 40%)
+			content: attr(data-date)
+			text-align: right
+			font-weight: 100    
+			font-size: 0.9em
+			min-width: $date
+			// font-family: $font-title
+		&:after
+			box-shadow: 0 0 0 $dotborder #004ffc
+			position: absolute  
+			left: ($spacing + $line + ($dot * 0.35)) * -1 + 18
+			background: lighten($tile-bg, 30%)
+			border-radius: 50%
+			height: $dot
+			width: $dot
+			content: ""
+			top: 5px
 
 @import "elements"
 

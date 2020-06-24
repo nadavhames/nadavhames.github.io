@@ -1,0 +1,2 @@
+User-agent: *
+Sitemap: https://nadavhames.com/sitemap.xml

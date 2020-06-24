@@ -10,7 +10,7 @@ I will update this site periodically with various things I am working on. Feel f
 
 <div class="loading">Work in Progress</div> 
 
-- Stay tuned for a demo of **Tavim** - a music notation renderer & editor designed & built from scratch with Typescript, React/Redux. [Jonah Dlin](http://jonahdlin.com/) and I are hard at work reading dissertations, learning spacing algorithms & writing thousands of lines of code to industry specs. 
+- Stay tuned for a demo of **Tavim** - a music notation renderer & collaborative editor designed & built from scratch with Typescript, React/Redux. [Jonah Dlin](http://jonahdlin.com/) and I are hard at work reading dissertations, learning spacing algorithms & writing thousands of lines of code to industry specs. 
 
 <ul class="timeline">
     <li class="event" data-date="Feb 2020">
@@ -35,7 +35,7 @@ I will update this site periodically with various things I am working on. Feel f
 		  </div> 
       </div>   
     </li>
-    <li class="event" data-date="Summer 2019">
+    <li class="event" data-date="Summer 2018">
 	  <div style="display: flex">
 		  <div style="flex: 0 0 15%;">
 			<img style="max-width: 70px; margin: 0" src="https://infosec-jobs.com/media/company/logo/20/03/MicroFocus.jpg" />

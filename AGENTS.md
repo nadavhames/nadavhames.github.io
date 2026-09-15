@@ -252,6 +252,21 @@ label column), `--gutter`, and `--pad` (page margin). `--pad` sits outside the o
 widening the margin never squeezes the text. Every block uses the same `.shell` container, keeping
 left and right margins identical from masthead to footer.
 
+Readability rules:
+
+- Three tiers, each with its own face and brightness, so the eye hops from title to title: serif
+  titles in `--text` (job roles, project names, page titles), sans paragraphs in `--body`, mono
+  details in `--faint`. Keep `--body` about a third dimmer than `--text` (≈ 1.5:1 between them) or
+  titles stop standing out.
+- Running text (the prose classes grouped near the top of `site.css`) is at least 16px, line-height
+  1.7, `text-wrap: pretty`, in `--body`. Add new
+  paragraph classes to that group rather than styling them separately; links inside get an
+  underline there too.
+- Lines stay around 60–70 characters (`--measure`). Mono metadata and labels stay at 0.72rem or
+  more (larger on small screens); `--faint` is the dimmest colour allowed for text, ≥ 5:1.
+- Font smoothing is a token (`--smoothing`): thinned only in dark mode, where light-on-dark text
+  otherwise looks heavy. Inter is loaded with its optical-size axis.
+
 Dark is the default palette on `:root`; light is repeated under
 `@media (prefers-color-scheme: light)` and `:root[data-theme="light"]` (the header toggle, stored in
 `localStorage`). Pages must work at 320px wide and keep text contrast at WCAG AA in both themes.

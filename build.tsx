@@ -152,7 +152,8 @@ document.addEventListener('DOMContentLoaded', function () {
 `.trim();
 
 const FONTS =
-  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600" +
+  // Inter's optical-size axis sturdies small text and tightens large text automatically.
+  "https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..600" +
   "&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..400" +
   "&family=JetBrains+Mono:wght@400&display=swap";
 

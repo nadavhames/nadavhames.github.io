@@ -1,0 +1,63 @@
+name: deploy
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+  # Called by import-resume.yml once it has committed a new PDF.
+  workflow_call:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a running deploy finish rather than cancelling it; queue the next push behind it.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          # Keep in step with the version pinned in mise.toml.
+          bun-version: "1.3"
+
+      # Preact and preact-render-to-string, used only to render the pages.
+      - run: bun install --frozen-lockfile
+
+      # Renders index.html and 404.html from content.ts. This is why editing
+      # text and pushing is enough — the build never has to happen locally.
+      - run: bun run build
+
+      - name: Collect the files that should be served
+        run: |
+          mkdir _site
+          rsync -a \
+            --exclude '.git' --exclude '.github' --exclude '.claude' \
+            --exclude 'node_modules' --exclude '_site' \
+            --exclude '*.ts' --exclude '*.tsx' --exclude 'tsconfig.json' \
+            --exclude 'package.json' --exclude 'bun.lock' --exclude 'mise.toml' \
+            --exclude '*.md' --exclude '.gitignore' \
+            --exclude '.prettierrc.json' --exclude '.prettierignore' \
+            ./ _site/
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

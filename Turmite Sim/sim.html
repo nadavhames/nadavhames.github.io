@@ -1,113 +1,31 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Turmite Sim — Nadav Hames</title><meta name="description" content="Two-dimensional Turing machines that leave surprisingly intricate trails on a grid."/><script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script><meta name="theme-color" content="#181b21" media="(prefers-color-scheme: dark)"/><meta name="theme-color" content="#fbf9f6" media="(prefers-color-scheme: light)"/><link rel="icon" href="/favicon.ico" sizes="any"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..400&amp;family=JetBrains+Mono:wght@400&amp;display=swap"/><link rel="stylesheet" href="/assets/site.css"/><script>(function () {
+    document.documentElement.classList.add('js');
+    try {
+        var s = localStorage.getItem('theme');
+        if (s === 'light' || s === 'dark') document.documentElement.setAttribute('data-theme', s);
+    } catch (e) {}
 
-<head>
-    <!-- meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    // Umami skips any browser with this key set. Visit /?notrack once on each of
+    // your own browsers so your visits aren't counted; /?track undoes it.
+    try {
+        var params = new URLSearchParams(location.search);
+        if (params.has('notrack')) localStorage.setItem('umami.disabled', '1');
+        if (params.has('track')) localStorage.removeItem('umami.disabled');
+    } catch (e) {}
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy"
-        crossorigin="anonymous">
-    <link rel="stylesheet" href="./Styles/style.css">
-    <link rel="stylesheet" href="./Styles/animate.css">
-
-    <title>Turmite Sim</title>
-</head>
-
-<body onload="loadStates(); initGrid();">
-    <div class="animated rollIn">
-        <div class="container">
-            <div class="header clearfix">
-                <h3 class="text-muted">Turmite Simulator</h3>
-            </div>
-
-            <div class="jumbotron">
-                <canvas id="canvas" width="500" height="500"></canvas>
-                <div class="col-lg" id="select">
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <button class="btn btn-outline-secondary" type="button" id="start" onclick="start();">Start</button>
-                        </div>
-                        <div class="input-group-prepend">
-                            <button class="btn btn-outline-secondary" type="button" id="clear" onclick="clearCanvas();">Clear</button>
-                        </div>
-                        <select class="custom-select" id="inputGroupSelect" onchange="getPreset();">
-                            <option value="1">Custom</option>
-                            <option value="2" selected>Spiral</option>
-                            <option value="3">Fibonacci</option>
-                            <option value="4">Snowflake</option>
-                            <option value="5">Texture</option>
-                            <option value="6">Frame</option>
-                            <option value="7">Semichaotic</option>
-                        </select>
-                        <div class="input-group-append">
-                            <input class="input-group-text" id="timeSteps"></input>
-                        </div>
-                        <div class="input-group-append">
-                            <span class="input-group-text" id="Wh">ms/move</span>
-                        </div>
-                    </div>
-                    <div id="stateContainer"></div>
-                    <div id="addSub">
-                        <button type="button" class="btn btn-default btn-sm" id="add" onclick="addState();">
-                            <span>+</span>
-                        </button>
-                        <button type="button" class="btn btn-default btn-sm" id="sub" onclick="removeState();">
-                            <span>-</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row marketing">
-                <div class="col-lg-6">
-                    <h4>About</h4>
-                    <p>Welcome to my turmite sim!
-                        <br /> After taking EECS2001 at York University and learning about models of computation (including turing
-                        machines), I decided that it would be apt to try to make something that is both visually interesting
-                        and conveys some of the courses concepts. Feel free to try the available presets via the dropdown
-                        or make your own instructions.
-                        <br /> I hope you enjoy!
-                        <br /> For more information, click
-                        <a href="https://en.wikipedia.org/wiki/Turmite">here</a> or
-                        <a href="https://web.archive.org/web/20161023060939/http://vincentverheyen.com/node/40">here</a>.
-                        <br />
-                    </p>
-                </div>
-
-                <div class="col-lg-6">
-                    <h4>Guide</h4>
-                    <p>Turmites perform the following operations each timestep: turn on the spot, (by some multiple of 90°)
-                        change the color of the current square, and move forward one square in the direction it is facing.
-                        <br /> The direction to turn is one of L (90° left), R (90° right), N (no turn) and U (180° U-turn).
-                        <br /> This simulator uses the format of |SetColourTo|SetTurnto|GoToState| to tell the turmite where to
-                        go: Depending on current colour and state, the corresponding instruction is chosen.
-                        <br /> To add or remove states, use the '+' and '-' buttons.
-                        <br /> A more readable version of the table is available on wikipedia
-                        <a href="https://en.wikipedia.org/wiki/Turmite">here</a>
-                    </p>
-                </div>
-            </div>
-
-            <footer class="footer">
-                <p>&copy; 2018 Nadav Hames</p>
-            </footer>
-
-        </div>
-        <!-- /container -->
-    </div>
-
-
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-        crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4"
-        crossorigin="anonymous"></script>
-    <script src="./Styles/watch.js"></script>
-    <script src="./Styles/canvas-grid.js"></script>
-    <script src="./Styles/sim.js"></script>
-</body>
-
-</html>
+    // Start a refresh at the top, leaving back/forward restoration alone. This
+    // must stay 'manual' for the life of the page: setting it back to 'auto'
+    // re-arms restoration, which then undoes the scroll.
+    try {
+        var nav = performance.getEntriesByType('navigation')[0];
+        if (nav && nav.type === 'reload' && 'scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+            addEventListener('load', function () { scrollTo(0, 0); });
+        }
+    } catch (e) {}
+})();</script><script defer src="https://cloud.umami.is/script.js" data-website-id="17026d89-d1a2-47c4-989f-f265eb89d184" data-domains="nadavhames.com,www.nadavhames.com"></script></head><body><div class="marginalia" aria-hidden="true"><div class="marginalia__side marginalia__side--left"><span style="--x:8%;--y:4;--size:1.54rem;--speed:0.204;--peak:0.182;--rot:-5deg">♩</span><span style="--x:15%;--y:34;--size:1.59rem;--speed:0.212;--peak:0.186;--rot:-13deg">♬</span><span style="--x:26%;--y:73;--size:1.50rem;--speed:0.195;--peak:0.178;--rot:-7deg">♯</span><span style="--x:35%;--y:65;--size:1.41rem;--speed:0.180;--peak:0.170;--rot:2deg">♫</span><span style="--x:48%;--y:0;--size:1.09rem;--speed:0.124;--peak:0.142;--rot:1deg">♮</span><span style="--x:56%;--y:28;--size:1.85rem;--speed:0.257;--peak:0.208;--rot:-14deg">♪</span><span style="--x:65%;--y:67;--size:2.54rem;--speed:0.378;--peak:0.269;--rot:3deg">♭</span><span style="--x:72%;--y:100;--size:2.00rem;--speed:0.284;--peak:0.222;--rot:14deg">♩</span><span style="--x:84%;--y:14;--size:1.81rem;--speed:0.250;--peak:0.205;--rot:-13deg">♬</span><span style="--x:90%;--y:69;--size:1.21rem;--speed:0.145;--peak:0.153;--rot:13deg">♯</span></div><div class="marginalia__side marginalia__side--right"><span style="--x:6%;--y:3;--size:2.34rem;--speed:0.342;--peak:0.251;--rot:3deg">♫</span><span style="--x:15%;--y:22;--size:2.45rem;--speed:0.362;--peak:0.261;--rot:-5deg">♮</span><span style="--x:27%;--y:14;--size:1.82rem;--speed:0.251;--peak:0.206;--rot:-6deg">♪</span><span style="--x:33%;--y:43;--size:1.47rem;--speed:0.191;--peak:0.176;--rot:10deg">♭</span><span style="--x:42%;--y:27;--size:2.07rem;--speed:0.295;--peak:0.227;--rot:13deg">♩</span><span style="--x:53%;--y:39;--size:1.88rem;--speed:0.262;--peak:0.211;--rot:-2deg">♬</span><span style="--x:65%;--y:71;--size:2.34rem;--speed:0.342;--peak:0.251;--rot:-1deg">♯</span><span style="--x:70%;--y:69;--size:1.08rem;--speed:0.122;--peak:0.141;--rot:-5deg">♫</span><span style="--x:82%;--y:12;--size:2.35rem;--speed:0.344;--peak:0.252;--rot:-1deg">♮</span><span style="--x:90%;--y:25;--size:2.83rem;--speed:0.427;--peak:0.294;--rot:-11deg">♪</span></div></div><header class="topbar"><div class="shell topbar__inner"><a class="mark" href="/">Nadav Hames</a><nav class="nav" aria-label="Primary"><a href="/#contact" data-scroll-to="contact" data-umami-event="contact-nav">Contact</a><a class="is-cta" href="/Nadav-Hames-Resume.pdf" target="_blank" rel="noopener" data-umami-event="resume-open" data-umami-event-url="/Nadav-Hames-Resume.pdf" data-umami-event-location="project-header">Resume</a><button class="theme-toggle" type="button" aria-label="Switch colour theme"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4"></path></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.6 8.6 0 1 1 9.7 3.5a6.9 6.9 0 0 0 10.8 10.8z"></path></svg></button></nav></div></header><main class="game"><div class="shell"><a class="game__back" href="/#projects">← Projects</a><h1 class="game__title">Turmite Sim</h1><p class="game__blurb">Two-dimensional Turing machines that leave surprisingly intricate trails on a grid.</p><div class="game__stage"><div class="turmite"><canvas class="turmite__canvas" id="canvas" width="500" height="500"></canvas><div class="turmite__bar"><button class="button" id="start" type="button" aria-pressed="false">Start</button><button class="button button--quiet" id="clear" type="button">Clear</button><label class="control"><span>Preset</span><select class="control__input" id="inputGroupSelect"><option value="1">Custom</option><option value="2" selected>Spiral</option><option value="3">Fibonacci</option><option value="4">Snowflake</option><option value="5">Texture</option><option value="6">Frame</option><option value="7">Semichaotic</option></select></label><label class="control"><span>ms / move</span><input class="control__input control__input--short" id="timeSteps" type="text" inputmode="numeric"/></label></div><div class="turmite__rules"><div class="turmite__head" aria-hidden="true"><span></span><span>On white</span><span>On black</span></div><div class="turmite__states" id="stateContainer"></div><div class="turmite__adjust"><button class="button button--quiet" id="add" type="button" aria-label="Add a state">+</button><button class="button button--quiet" id="sub" type="button" aria-label="Remove the last state">−</button></div></div><div class="turmite__notes"><section><h2>About</h2><p>After learning about models of computation, Turing machines included, in EECS 2001 at York University, I wanted to build something visually interesting that shows some of the course's ideas at work.</p><p>Try the presets, or write your own rules. More on turmites at <a href="https://en.wikipedia.org/wiki/Turmite" target="_blank" rel="noopener" data-umami-event="outbound-click" data-umami-event-url="https://en.wikipedia.org/wiki/Turmite" data-umami-event-location="turmite">Wikipedia</a> and in <a href="https://web.archive.org/web/20161023060939/http://vincentverheyen.com/node/40" target="_blank" rel="noopener" data-umami-event="outbound-click" data-umami-event-url="https://web.archive.org/web/20161023060939/http://vincentverheyen.com/node/40" data-umami-event-location="turmite">Vincent Verheyen's notes</a>.</p></section><section><h2>Guide</h2><p>Each step, the turmite paints the square it stands on, turns, and moves forward one square. What it does depends on its current state and the colour beneath it.</p><p>Every state has a rule for a white square and one for a black square: the colour to paint (B or W), the turn (L left, R right, N none, U about-face) and the state to switch to next.</p></section></div></div></div></div></main><footer class="footer shell"><div class="footer__inner"><span>©<span id="year"></span> Nadav Hames</span><span><a href="/">Home</a></span></div></footer><script src="/assets/theme.js" defer></script><script src="/assets/marginalia.js" defer></script><script>// Set at view time, not build time, so the same content.ts always renders the
+// same bytes. Without JS the line reads "© Nadav Hames".
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('year').textContent = ' ' + new Date().getFullYear();
+});</script><script src="/Turmite%20Sim/Styles/watch.js"></script><script src="/Turmite%20Sim/Styles/canvas-grid.js"></script><script src="/Turmite%20Sim/Styles/sim.js"></script></body></html>

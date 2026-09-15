@@ -1,0 +1,113 @@
+name: import resume
+
+# Manual only. workflow_dispatch already requires write access to the repo, and
+# the job additionally checks the actor is the repository owner.
+on:
+  workflow_dispatch:
+    inputs:
+      token:
+        description: "FlowCV share token (the id in flowcv.com/resume/<token>)"
+        required: false
+        default: "9kmwv9r068vq"
+        type: string
+      url:
+        description: "Full download URL, if you want to override the FlowCV one entirely"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+# Deliberately not the "pages" group used by deploy.yml — this workflow calls
+# that one, so sharing a group would have it waiting on a lock it already holds.
+concurrency:
+  group: import-resume
+  cancel-in-progress: false
+
+jobs:
+  import:
+    if: github.actor == github.repository_owner
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch the PDF
+        id: fetch
+        env:
+          TOKEN: ${{ inputs.token }}
+          URL: ${{ inputs.url }}
+          TARGET: Nadav-Hames-Resume.pdf
+        run: |
+          set -euo pipefail
+
+          # This is the endpoint the Download button on the public resume page
+          # calls. It needs no authentication — the share token is the whole key,
+          # and it is already public in the flowcv.com/resume/<token> link.
+          url="${URL:-}"
+          if [ -z "$url" ]; then
+            if [ -z "${TOKEN:-}" ]; then
+              echo "::error::Give either a FlowCV token or a full url."
+              exit 1
+            fi
+            url="https://app.flowcv.com/api/public/download_resume?token=${TOKEN}"
+          fi
+
+          # FlowCV throttles this endpoint hard: a repeat call within a few
+          # minutes comes back 429 with Retry-After around 186 seconds. Curl
+          # retries 429 on its own and honours Retry-After — as long as we do
+          # not pass --retry-delay, which would override the header.
+          status=$(curl --silent --show-error --location \
+                        --connect-timeout 20 --retry 3 --retry-max-time 600 \
+                        --write-out '%{http_code}' \
+                        --output candidate.pdf "$url")
+
+          if [ "$status" = "429" ]; then
+            echo "::error::FlowCV is still rate-limiting the download (HTTP 429). Wait ~3 minutes and run this again."
+            exit 1
+          fi
+          if [ "$status" != "200" ]; then
+            echo "::error::Download failed with HTTP ${status}: $(head -c 200 candidate.pdf)"
+            exit 1
+          fi
+
+          # A login or error page can also arrive as 200, so confirm it really
+          # is a PDF before letting it anywhere near the published site.
+          if [ "$(head -c 5 candidate.pdf)" != "%PDF-" ]; then
+            echo "::error::That URL did not return a PDF. First bytes: $(head -c 120 candidate.pdf | tr -d '\0')"
+            exit 1
+          fi
+
+          size=$(stat -c%s candidate.pdf)
+          if [ "$size" -lt 10000 ]; then
+            echo "::error::PDF is only ${size} bytes, which is too small to be the real thing."
+            exit 1
+          fi
+
+          # No "skip if unchanged" check here on purpose: FlowCV re-renders the
+          # PDF on every request, so the bytes differ each time even when the
+          # resume has not been touched. A byte comparison would never once say
+          # "unchanged", and comparing the text would mean parsing the PDF in CI
+          # for very little — this is a manual workflow you run when there is
+          # something new. Running it twice just makes two commits.
+          mv candidate.pdf "$TARGET"
+          echo "Fetched the resume (${size} bytes)."
+
+      - name: Commit it
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Nadav-Hames-Resume.pdf
+          git commit -m "Update resume PDF from FlowCV"
+          git push
+
+  # A push made with GITHUB_TOKEN does not trigger other workflows, so deploy.yml
+  # would never fire on its own. Calling it explicitly is what rebuilds and ships.
+  deploy:
+    needs: import
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/deploy.yml

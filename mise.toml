@@ -1,0 +1,17 @@
+# Pins the Bun this project expects. The tasks are thin wrappers around the
+# package.json scripts so `mise run dev` and `bun dev` do exactly the same thing.
+
+[tools]
+bun = "1.3"
+
+[tasks.dev]
+description = "Serve the site locally with live reload"
+run = "bun run dev"
+
+[tasks.build]
+description = "Regenerate every HTML page from content.ts"
+run = "bun run build"
+
+[tasks.check]
+description = "Verify the committed pages match content.ts"
+run = "bun run check"

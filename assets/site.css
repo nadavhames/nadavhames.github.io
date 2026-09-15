@@ -1,0 +1,1547 @@
+/* ==========================================================================
+   nadavhames.com — shared styles
+   ========================================================================== */
+
+/* Dark is the default palette. Light applies when the OS asks for it (unless
+   the visitor has explicitly chosen dark) or when it is chosen outright.
+   Every theme-dependent value is a token here, so no rule further down this
+   file needs a theme selector of its own. */
+
+:root {
+  /* A soft dark slate rather than near-black. If you change this, update the
+     dark theme-color meta tag in build.tsx to match. */
+  --bg: #181b21;
+  --surface: #21252c;
+  --line: #343a45;
+  --line-soft: #272c34;
+  --text: #e7e9ee;
+  --muted: #9aa3b1;
+  --faint: #7d8593;
+  --accent: #e8b96a;
+  --on-accent: #12141a;
+  --danger: #ec8f7f;
+  --scheme: dark; /* native controls such as <select> menus */
+  --echo-1: #e8b96a;
+  --echo-2: #e98b74;
+  --echo-3: #94c9a0;
+  --echo-4: #86b6e6;
+  --echo-5: #b9a0ea;
+  /* Idle wedges sink toward the surface; lit ones rise toward white. */
+  --echo-idle: 38%;
+  --echo-idle-base: var(--surface);
+  --echo-hover: 52%;
+  --echo-lit: 88%;
+  --echo-glow: 9px;
+  --selection: rgba(232, 185, 106, 0.25);
+  --shadow-pop: 0 16px 44px -20px rgba(0, 0, 0, 0.8), 0 2px 6px rgba(0, 0, 0, 0.35);
+
+  --serif: "Newsreader", Georgia, "Times New Roman", serif;
+  --sans:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --measure: 34rem; /* the text column */
+  --label: 6.5rem; /* the hanging label column */
+  --gutter: 2rem;
+  /* Sits outside the columns above, so widening it never squeezes the text. */
+  --pad: clamp(1.25rem, 5vw, 3rem);
+  /* Total width of the page column; the glyph strip fills what is left beside it. */
+  --column: calc(var(--label) + var(--gutter) + var(--measure) + var(--pad) * 2);
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #fbf9f6;
+    --surface: #ffffff;
+    --line: #ded8cd;
+    --line-soft: #eae5dc;
+    --text: #1b1d21;
+    --muted: #575e69;
+    --faint: #6a717d;
+    --accent: #936616;
+    --on-accent: #ffffff;
+    --danger: #a63a29;
+    --scheme: light;
+    --echo-1: #e39c24;
+    --echo-2: #eb6b4e;
+    --echo-3: #3fab6b;
+    --echo-4: #3f8ce3;
+    --echo-5: #8f68e0;
+    /* Vivid hues shown as they are; a lit wedge flashes pale, with a wider glow to carry it. */
+    --echo-idle: 100%;
+    --echo-idle-base: var(--surface);
+    --echo-hover: 86%;
+    --echo-lit: 28%;
+    --echo-glow: 13px;
+    --selection: rgba(154, 107, 23, 0.18);
+    --shadow-pop: 0 16px 44px -22px rgba(60, 48, 24, 0.42), 0 2px 6px rgba(60, 48, 24, 0.1);
+  }
+}
+
+:root[data-theme="light"] {
+  --scheme: light;
+  --bg: #fbf9f6;
+  --surface: #ffffff;
+  --line: #ded8cd;
+  --line-soft: #eae5dc;
+  --text: #1b1d21;
+  --muted: #575e69;
+  --faint: #6a717d;
+  --accent: #936616;
+  --on-accent: #ffffff;
+  --danger: #a63a29;
+  --echo-1: #e39c24;
+  --echo-2: #eb6b4e;
+  --echo-3: #3fab6b;
+  --echo-4: #3f8ce3;
+  --echo-5: #8f68e0;
+  /* Vivid hues shown as they are; a lit wedge flashes pale, with a wider glow to carry it. */
+  --echo-idle: 100%;
+  --echo-idle-base: var(--surface);
+  --echo-hover: 86%;
+  --echo-lit: 28%;
+  --echo-glow: 13px;
+  --selection: rgba(154, 107, 23, 0.18);
+  --shadow-pop: 0 16px 44px -22px rgba(60, 48, 24, 0.42), 0 2px 6px rgba(60, 48, 24, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 4.5rem;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column; /* keeps the footer at the bottom on short pages */
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+main {
+  flex: 1 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+::selection {
+  background: var(--selection);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  text-underline-offset: 2px;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 400;
+  line-height: 1.2;
+}
+p {
+  margin: 0;
+}
+
+:focus-visible {
+  outline: 1.5px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.shell {
+  width: 100%;
+  max-width: var(--column);
+  margin-inline: auto;
+  padding-inline: var(--pad);
+}
+
+.skip-link {
+  position: absolute;
+  display: block; /* an inline <a> would ignore the width/height below */
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  background: var(--accent);
+  color: var(--bg);
+  padding: 0.5rem 0.9rem;
+  z-index: 100;
+}
+.skip-link:focus {
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+  left: 1rem;
+  top: 1rem;
+}
+
+/* ---------- Top bar ---------------------------------------------------- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+.topbar.is-stuck {
+  border-bottom-color: var(--line-soft);
+}
+
+.topbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  height: 3.25rem;
+}
+
+.mark {
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.mark:hover {
+  text-decoration: none;
+  color: var(--accent);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+}
+.nav a {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.nav a:hover {
+  color: var(--text);
+  text-decoration: none;
+}
+.nav a.is-cta {
+  color: var(--accent);
+}
+.nav a.is-cta:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--faint);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.theme-toggle:hover {
+  color: var(--accent);
+}
+.theme-toggle svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Shows the theme you would switch to: a sun while dark, a moon while light. */
+.theme-toggle .icon-moon {
+  display: none;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .theme-toggle .icon-sun {
+    display: none;
+  }
+  :root:not([data-theme="dark"]) .theme-toggle .icon-moon {
+    display: block;
+  }
+}
+:root[data-theme="light"] .theme-toggle .icon-sun {
+  display: none;
+}
+:root[data-theme="light"] .theme-toggle .icon-moon {
+  display: block;
+}
+
+/* ---------- Résumé hover preview ---------------------------------------- */
+
+.peek {
+  position: relative;
+  display: inline-flex;
+}
+
+.peek__card {
+  display: block;
+  position: absolute;
+  top: calc(100% + 0.6rem);
+  right: 0;
+  width: 270px;
+  padding: 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-pop);
+  opacity: 0;
+  /* visibility (not pointer-events) does the hiding, so that once the card is
+     shown the pointer can travel onto it without dropping the hover. */
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    visibility 0.15s;
+  cursor: pointer;
+  z-index: 60;
+}
+.peek__card:hover {
+  text-decoration: none;
+}
+
+/* The gap between the link and the card would otherwise drop the hover. */
+.peek__card::before {
+  content: "";
+  position: absolute;
+  inset: -0.7rem 0 auto 0;
+  height: 0.7rem;
+}
+
+/* Only where hovering is a real gesture; taps just follow the link. */
+@media (hover: hover) and (pointer: fine) {
+  .peek:hover .peek__card,
+  .peek:focus-within .peek__card {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+}
+
+/* A span by default, so it must be told to be a block — inline elements ignore
+   aspect-ratio, which left the frame zero-width and the page size unreserved. */
+.peek__frame {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  aspect-ratio: 1 / 1.414;
+}
+
+.peek__frame canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.peek.is-ready .peek__frame canvas {
+  opacity: 1;
+}
+
+.peek__state {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 0.45rem;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  color: #8a8f98;
+  background: #fff;
+  text-align: center;
+  padding: 1rem;
+}
+.peek.is-ready .peek__state {
+  display: none;
+}
+.peek.is-error .peek__spinner {
+  display: none;
+}
+.peek__state .err {
+  display: none;
+}
+.peek.is-error .peek__state .err {
+  display: block;
+}
+.peek.is-error .peek__state .wait {
+  display: none;
+}
+
+.peek__spinner {
+  width: 15px;
+  height: 15px;
+  border: 1.5px solid rgba(0, 0, 0, 0.12);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: peek-spin 0.7s linear infinite;
+}
+@keyframes peek-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.peek__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.45rem;
+  padding: 0 0.1rem;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.peek__foot .open {
+  color: var(--accent);
+}
+
+/* ---------- Masthead ----------------------------------------------------- */
+
+.masthead {
+  position: relative;
+  padding: 3.5rem 0 2.25rem;
+}
+
+.masthead__name {
+  font-family: var(--serif);
+  font-size: 2.6rem;
+  line-height: 1;
+  letter-spacing: 0.005em;
+}
+
+.masthead__role {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+.masthead__role em {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.1em;
+  color: var(--text);
+}
+
+.masthead__lead {
+  margin-top: 0.85rem;
+  max-width: var(--measure);
+  color: var(--muted);
+}
+
+.contacts {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.1rem 0.55rem;
+  font-family: var(--mono);
+  font-size: 0.71rem;
+  letter-spacing: 0.03em;
+}
+.contacts a {
+  color: var(--muted);
+}
+.contacts a:hover {
+  color: var(--accent);
+}
+.contacts .sep {
+  color: var(--line);
+}
+
+/* ---------- Margin symbols -----------------------------------------------
+   The strip is the space left beside the page column, so symbols can be large
+   without ever crossing a word. assets/marginalia.js drives the transform.
+-------------------------------------------------------------------------- */
+
+.marginalia {
+  position: fixed;
+  inset: 0;
+  z-index: 0; /* content sits on z-index 1; see main / .footer below */
+  pointer-events: none;
+  overflow: hidden;
+  /* `both` holds it at zero through the delay, covering the moment before the
+     script has positioned anything. Pure CSS, so it fades in even if JS fails. */
+  animation: marginalia-in 450ms ease-out 120ms both;
+}
+
+@keyframes marginalia-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.marginalia__side {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  /* Exactly the leftover space beside the page column. Percentage rather than
+     vw, which would include the scrollbar and push the strip over the text. */
+  width: max(0px, calc((100% - var(--column)) / 2));
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
+}
+
+.marginalia__side--left {
+  left: 0;
+}
+.marginalia__side--right {
+  right: 0;
+}
+
+.marginalia span {
+  position: absolute;
+  left: var(--x);
+  top: 0;
+  font-family: var(--serif);
+  font-size: var(--size);
+  line-height: 1;
+  color: var(--accent);
+  opacity: var(--peak);
+  will-change: transform;
+  /* Placed from --y until the script takes over, so the first paint is right. */
+  /* The -50% centres the glyph on --x, so a symbol near the outer edge is not
+     pushed out of the strip by its own width. */
+  transform: translate3d(-50%, calc(var(--y) * 1vh), 0) rotate(var(--rot));
+}
+
+@media (max-width: 60rem) {
+  .marginalia {
+    display: none;
+  }
+}
+
+/* ---------- Bands (label in the margin, content beside it) --------------- */
+
+/* The rule sits on the inner element so it spans the text column rather than
+   the whole viewport, and stops short of the page margin. */
+.band__grid {
+  display: grid;
+  grid-template-columns: var(--label) minmax(0, 1fr);
+  gap: 0 var(--gutter);
+  padding-block: 1.5rem;
+  border-top: 1px solid var(--line-soft);
+}
+
+.band__label {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
+  text-align: right;
+  padding-top: 0.25rem;
+}
+
+@media (max-width: 40rem) {
+  .band__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.65rem;
+  }
+  .band__label {
+    text-align: left;
+    padding-top: 0;
+  }
+}
+
+/* ---------- Work --------------------------------------------------------- */
+
+.entry + .entry {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dotted var(--line-soft);
+}
+
+.entry__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.2rem 1rem;
+}
+
+.entry__what {
+  font-size: 0.96rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  flex: 1 1 auto;
+}
+.entry__what .at {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.entry__when {
+  font-family: var(--mono);
+  font-size: 0.67rem;
+  letter-spacing: 0.03em;
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+.entry__where {
+  margin-top: 0.05rem;
+  font-size: 0.75rem;
+  color: var(--faint);
+}
+
+.entry__body {
+  margin-top: 0.35rem;
+  color: var(--muted);
+  font-size: 0.89rem;
+}
+
+.stack {
+  margin-top: 0.35rem;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  color: var(--faint);
+}
+.stack b {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* ---------- Projects ----------------------------------------------------- */
+
+.project {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.05rem 0.9rem;
+  padding: 0.6rem 0;
+  border-top: 1px dotted var(--line-soft);
+}
+.project:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.project__name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+.project__name a {
+  color: var(--text);
+}
+.project__name a:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+.project__name .ext {
+  font-family: var(--mono);
+  font-size: 0.58em;
+  color: var(--faint);
+  vertical-align: 0.34em;
+  margin-left: 0.2em;
+}
+.project__name a:hover .ext {
+  color: var(--accent);
+}
+
+.project__meta {
+  grid-column: 2;
+  grid-row: 1;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+.project__body {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+@media (max-width: 30rem) {
+  .project {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .project__meta {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+/* ---------- Contact ------------------------------------------------------ */
+
+.contact-form {
+  display: grid;
+  gap: 1.15rem;
+}
+
+.contact-form__intro {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.contact-form__trap {
+  display: none;
+}
+
+.contact-form__row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.15rem 1.25rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.field__label {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
+  transition: color 0.15s ease;
+}
+.field:focus-within .field__label {
+  color: var(--accent);
+}
+
+.field__input {
+  width: 100%;
+  margin: 0;
+  padding: 0.65rem 0.8rem;
+  font: inherit;
+  font-size: 1rem; /* 16px: anything smaller makes iOS zoom the page on focus */
+  line-height: 1.4;
+  color: var(--text);
+  background: var(--surface);
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.field__input:hover {
+  border-bottom-color: var(--faint);
+}
+.field__input:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+  /* Doubles the rule to 2px without shifting the layout by a pixel. */
+  box-shadow: inset 0 -1px 0 var(--accent);
+}
+/* :user-invalid waits until someone has interacted, so an empty form isn't shouting. */
+.field__input:user-invalid {
+  border-bottom-color: var(--danger);
+  box-shadow: inset 0 -1px 0 var(--danger);
+}
+.field__input--area {
+  min-height: 8.5rem;
+  resize: vertical;
+  line-height: 1.55;
+}
+/* Browser autofill otherwise paints its own pale background over the theme. */
+.field__input:-webkit-autofill {
+  -webkit-text-fill-color: var(--text);
+  -webkit-box-shadow: inset 0 0 0 100px var(--surface);
+  caret-color: var(--text);
+}
+
+.contact-form__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  margin-top: 0.2rem;
+}
+
+.button,
+.contact-form__send,
+.echo__start {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.8rem 1.2rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--on-accent);
+  background: var(--accent);
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    opacity 0.15s ease;
+}
+.button:hover,
+.contact-form__send:hover,
+.echo__start:hover {
+  background: color-mix(in srgb, var(--accent) 85%, var(--text));
+}
+.contact-form__arrow {
+  transition: transform 0.2s ease;
+}
+.contact-form__send:hover .contact-form__arrow {
+  transform: translateX(3px);
+}
+.contact-form__send:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+.contact-form__send:disabled .contact-form__arrow {
+  transform: none;
+}
+
+.contact-form__status {
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+.contact-form[data-state="sent"] .contact-form__status {
+  color: var(--accent);
+}
+.contact-form[data-state="error"] .contact-form__status {
+  color: var(--danger);
+}
+
+@media (max-width: 34rem) {
+  .contact-form__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- Footer ------------------------------------------------------- */
+
+.footer {
+  position: relative;
+  z-index: 1;
+  padding-bottom: 2.25rem;
+}
+
+.footer__inner {
+  border-top: 1px solid var(--line-soft);
+  padding-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.3rem 1rem;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  color: var(--faint);
+}
+.footer a {
+  color: var(--faint);
+}
+.footer a:hover {
+  color: var(--accent);
+}
+
+/* ---------- Not found ---------------------------------------------------- */
+
+.notfound {
+  padding: 4.5rem 0 5rem;
+}
+.notfound__code {
+  display: inline-block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition:
+    transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1),
+    opacity 0.15s ease;
+  font-family: var(--serif);
+  font-size: 3.5rem;
+  line-height: 1;
+  color: var(--accent);
+}
+.notfound__rest {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  margin-top: 0.4rem;
+}
+.notfound__blurb {
+  margin-top: 0.45rem;
+  color: var(--muted);
+  max-width: var(--measure);
+}
+.notfound__links {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.55rem;
+  font-family: var(--mono);
+  font-size: 0.71rem;
+  letter-spacing: 0.03em;
+}
+.notfound__links .sep {
+  color: var(--line);
+}
+.notfound__code:hover {
+  transform: rotate(-4deg) scale(1.04);
+}
+.notfound__code:active {
+  transform: rotate(-4deg) scale(0.97);
+}
+
+/* ---------- Echo (404 easter egg) --------------------------------------- */
+
+.echo {
+  --echo-start: 120ms; /* assets/echo.js sets these, so the chimes land with the wedges */
+  --echo-stagger: 110ms;
+  --echo-duration: 620ms;
+  display: grid;
+  gap: 1rem;
+  max-width: 21rem;
+  margin-top: 1.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line-soft);
+}
+
+.echo__best {
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.echo__best b {
+  font-weight: 400;
+  color: var(--text);
+}
+
+.echo__stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+}
+
+.echo__ring {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.echo__pad {
+  --pad: color-mix(in srgb, var(--hue) var(--echo-idle), var(--echo-idle-base));
+  fill: var(--pad);
+  stroke: var(--pad);
+  stroke-width: 6;
+  stroke-linejoin: round;
+  /* Transforms pivot on the ring's centre, so wedges can spin and fan out around it. */
+  transform-box: view-box;
+  transform-origin: center;
+  transition:
+    fill 0.09s ease,
+    stroke 0.09s ease,
+    filter 0.12s ease,
+    transform 0.12s ease;
+  outline: none;
+}
+.echo__pad[aria-disabled="true"] {
+  cursor: default;
+}
+.echo__pad:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+.echo__pad:not([aria-disabled="true"]):hover {
+  --pad: color-mix(in srgb, var(--hue) var(--echo-hover), var(--echo-idle-base));
+}
+.echo__pad:focus-visible {
+  stroke: var(--text);
+}
+.echo__pad.is-lit {
+  --pad: color-mix(in srgb, var(--hue) var(--echo-lit), #fff);
+  filter: drop-shadow(0 0 var(--echo-glow) color-mix(in srgb, var(--hue) 75%, transparent));
+  transform: translate(calc(var(--dx) * 3px), calc(var(--dy) * 3px));
+}
+
+.echo__hub {
+  position: absolute;
+  inset: 31%;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+}
+.echo__start {
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  padding: 0;
+  border-radius: 50%;
+}
+.echo__round {
+  font-family: var(--serif);
+  font-size: clamp(1.9rem, 9vw, 2.6rem);
+  line-height: 1;
+  color: var(--text);
+}
+
+.echo__status {
+  min-height: 1.4em;
+  text-align: center;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+.echo[data-state="input"] .echo__status {
+  color: var(--accent);
+}
+.echo[data-state="over"] .echo__status {
+  color: var(--text);
+}
+
+/* Entrance: the wedges spin out from the hub one after another, then the hub pops in.
+   `backwards` holds each one hidden through its delay but lets go when it's done, so the
+   lit state's transform isn't overridden by a finished animation. */
+.echo.is-entering .echo__pad {
+  animation: echo-pad-in var(--echo-duration) cubic-bezier(0.2, 0.9, 0.25, 1.18) backwards;
+  animation-delay: calc(var(--echo-start) + var(--i) * var(--echo-stagger));
+}
+.echo.is-entering .echo__hub {
+  animation: echo-hub-in 0.5s cubic-bezier(0.3, 1.5, 0.5, 1) backwards;
+  animation-delay: calc(var(--echo-start) + 5 * var(--echo-stagger) + 80ms);
+}
+.echo.is-entering .echo__best,
+.echo.is-entering .echo__status {
+  animation: echo-fade-in 0.45s ease backwards;
+}
+
+@keyframes echo-pad-in {
+  from {
+    opacity: 0;
+    transform: rotate(-150deg) scale(0.3);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes echo-hub-in {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes echo-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.echo.is-wrong .echo__ring {
+  animation: echo-wobble 0.45s ease;
+}
+@keyframes echo-wobble {
+  20%,
+  60% {
+    transform: rotate(-5deg);
+  }
+  40%,
+  80% {
+    transform: rotate(5deg);
+  }
+}
+
+/* ---------- Project pages (Othello, Turmite Sim) ------------------------- */
+
+.game {
+  padding: 2.25rem 0 4rem;
+}
+
+.game__back {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.game__back:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.game__title {
+  margin-top: 0.9rem;
+  font-family: var(--serif);
+  font-size: 2.3rem;
+  line-height: 1;
+}
+
+.game__blurb {
+  margin-top: 0.5rem;
+  max-width: var(--measure);
+  color: var(--muted);
+}
+
+.game__stage {
+  margin-top: 1.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line-soft);
+}
+
+.button--quiet {
+  color: var(--text);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.button--quiet:hover {
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--faint);
+}
+
+/* Othello menu */
+
+.modes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.mode {
+  display: grid;
+  align-content: start;
+  gap: 0.4rem;
+  padding: 1.1rem 1.2rem 1.2rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  transition: border-color 0.15s ease;
+}
+.mode:hover {
+  text-decoration: none;
+  border-color: var(--accent);
+}
+
+.mode__label {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  line-height: 1.1;
+}
+.mode__arrow {
+  display: inline-block;
+  margin-left: 0.45rem;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--faint);
+  transition:
+    transform 0.2s ease,
+    color 0.15s ease;
+}
+.mode:hover .mode__arrow {
+  color: var(--accent);
+  transform: translateX(3px);
+}
+
+.mode__note {
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+/* Othello board. game.js paints cells with inline colours: the random board colour,
+   and literal black and white for the discs. */
+
+.othello {
+  /* Eight cells and nine 3px gaps fill the column on a phone, capped on wider screens. */
+  --cell: min(calc((100vw - 2 * var(--pad) - 27px) / 8), 3.4rem);
+  display: grid;
+  justify-items: start;
+  gap: 1rem;
+}
+
+.othello__bar,
+.othello__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
+.othello__turn {
+  border-collapse: collapse;
+}
+.othello__turn td {
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+.othello__turn p {
+  transition: color 0.2s ease;
+}
+
+.othello__board {
+  border-collapse: separate;
+  border-spacing: 3px;
+  background: var(--line);
+}
+.othello__board td {
+  width: var(--cell);
+  height: var(--cell);
+  padding: 0;
+  background: var(--surface);
+  border-radius: 2px;
+  transition: background-color 0.18s ease;
+}
+
+.othello__status {
+  min-height: 1.3em;
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  line-height: 1.2;
+}
+
+.othello__board td.is-legal {
+  cursor: pointer;
+}
+
+.othello__message,
+.othello__note {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.othello__note:empty {
+  display: none;
+}
+
+.othello__lobby,
+.othello__invite {
+  display: grid;
+  justify-items: start;
+  gap: 1rem;
+}
+
+.othello__code {
+  font-family: var(--mono);
+  font-size: 1.6rem;
+  letter-spacing: 0.22em;
+  color: var(--text);
+}
+
+.othello__join {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.75rem;
+}
+.othello__join .button {
+  height: 2.5rem;
+  padding-block: 0;
+}
+.othello__code-input {
+  width: 9rem;
+  font-family: var(--mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+a.button:hover {
+  text-decoration: none;
+}
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Turmite Sim */
+
+.turmite {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.turmite__canvas {
+  display: block;
+  width: 100%;
+  max-width: 30rem;
+  height: auto;
+  aspect-ratio: 1;
+  border: 1px solid var(--line);
+  image-rendering: pixelated;
+}
+
+.turmite__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.75rem;
+}
+.turmite__bar .button {
+  height: 2.5rem;
+  padding-block: 0;
+}
+.turmite__bar .button[aria-pressed="true"] {
+  background: var(--danger);
+}
+
+.control {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.control > span,
+.turmite__head {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.control__input,
+.turmite__state select,
+.turmite__state input {
+  height: 2.5rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0 0.55rem;
+  font: inherit;
+  font-size: 1rem; /* 16px, or iOS zooms in on focus */
+  color: var(--text);
+  background: var(--surface);
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  color-scheme: var(--scheme);
+}
+.control__input:focus,
+.turmite__state select:focus,
+.turmite__state input:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+  box-shadow: inset 0 -1px 0 var(--accent);
+}
+.control__input--short {
+  width: 5.5rem;
+}
+/* A single letter beside the native arrow: on a phone, side padding would clip it. */
+.turmite__state select {
+  padding: 0 0 0 0.4rem;
+}
+
+.turmite__rules {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.turmite__head,
+.turmite__state {
+  display: grid;
+  grid-template-columns: 4.5rem repeat(2, minmax(0, 1fr));
+  align-items: center;
+  gap: 0.45rem 1.25rem;
+}
+
+.turmite__states {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.turmite__name {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.turmite__rule {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.turmite__adjust {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+}
+.turmite__adjust .button {
+  width: 2.5rem;
+  height: 2.5rem;
+  justify-content: center;
+  padding: 0;
+  font-size: 1rem;
+  letter-spacing: 0;
+}
+
+.turmite__notes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem 2rem;
+  margin-top: 0.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line-soft);
+}
+.turmite__notes h2 {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.turmite__notes p {
+  margin-top: 0.5rem;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+@media (max-width: 40rem) {
+  .modes,
+  .turmite__notes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* The state name takes its own line, leaving the full width to the two rules. */
+  .turmite__head,
+  .turmite__state {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .turmite__head > span:first-child {
+    display: none;
+  }
+  .turmite__name {
+    grid-column: 1 / -1;
+    margin-top: 0.35rem;
+  }
+}
+
+/* ---------- Small screens ------------------------------------------------ */
+
+@media (max-width: 30rem) {
+  body {
+    font-size: 15.5px;
+  } /* a touch larger where the measure is narrow */
+
+  .masthead {
+    padding: 2.25rem 0 1.5rem;
+  }
+  .masthead__name {
+    font-size: 2rem;
+  } /* leaves slack for the wider fallback serif */
+
+  /* The monospaced details go unreadable first, so they scale up, not down. */
+  .contacts {
+    font-size: 0.78rem;
+    gap: 0.15rem 0.5rem;
+  }
+  .band__label,
+  .field__label {
+    font-size: 0.7rem;
+  }
+  .entry__when,
+  .project__meta {
+    font-size: 0.72rem;
+  }
+  .stack {
+    font-size: 0.72rem;
+    line-height: 1.8;
+  }
+  .entry__where {
+    font-size: 0.8rem;
+  }
+  .footer__inner {
+    font-size: 0.7rem;
+  }
+
+  .entry__head {
+    display: block;
+  }
+  .entry__when {
+    display: block;
+    margin-top: 0.1rem;
+  }
+
+  .project__meta {
+    color: var(--faint);
+  }
+
+  .nav {
+    gap: 0.95rem;
+  }
+  .nav a {
+    font-size: 0.74rem;
+  }
+  .mark {
+    font-size: 0.78rem;
+  }
+
+  .notfound {
+    padding: 3rem 0 3.5rem;
+  }
+  .notfound__links {
+    font-size: 0.78rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The symbols stay as static decoration: the rule above already places them
+     from --y, and assets/marginalia.js opts out of the scroll listener. */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

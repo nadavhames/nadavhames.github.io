@@ -1,133 +1,31 @@
-<html>
-<head><title>Othello</title>
-    <link rel="stylesheet" href="../online/styles/bootstrap.min.css">
-    <link rel="stylesheet" href="styles/animate.css">
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
-          integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-          crossorigin="anonymous"></script>
-    <script src="../online/styles/bootstrap.min.js" type="text/javascript"></script>
-    <link href="../online/styles/style.css" type="text/css" rel="stylesheet">
-    <script src="http://cdn.peerjs.com/0.3/peer.js" type="text/javascript"></script>
-    <script src="game.js" type="text/javascript"></script>
-</head>
-<body>
-<section id="menu">
-    <div class="animated fadeIn" id="menudiv">
-        <div>
-            <h1 id="title">Othello</h1>
-            <br />
-            <div class="no-support" style="display: none;">
-                <div class="alert">
-                    <p>Your browser deos not <a href="http://iswebrtcreadyyet.com">support WebRTC</a></p>
-                </div>
-            </div>
-            <div>
-                <a class="btn" id="host" onclick="hostStart();">Host</a>
-                <a class="btn" id="join" onclick="join();">Join</a>
-            </div>
-        </div>
-    </div>
-</section>
-<section id="game" style='display: none;' class="animated fadeIn">
-<div id="options">
-<h1 id="title">Othello</h1>
-<!--<button id="newgame" onclick="newgame();">New Game</button>-->
-<div id="turndiv">
-<table id="turntable" class="list-unstyled"><tr><td id="turncolor"><p id="turn">Turn</p></td></tr></table></div>
-</div>
-<div id="padding" class="bootstrap">
-<table id="board" class="table-bordered">
-  <tr>
-    <td id="11"></td>
-    <td id="21"></td> 
-    <td id="31"></td>
-    <td id="41"></td>
-    <td id="51"></td>
-    <td id="61"></td>
-    <td id="71"></td>
-    <td id="81"></td>
-  </tr>
-  <tr>
-    <td id="12"></td>
-    <td id="22"></td> 
-    <td id="32"></td>
-    <td id="42"></td>
-    <td id="52"></td>
-    <td id="62"></td>
-    <td id="72"></td>
-    <td id="82"></td>
-  </tr>  
-   <tr>
-    <td id="13"></td>
-    <td id="23"></td> 
-    <td id="33"></td>
-    <td id="43"></td>
-    <td id="53"></td>
-    <td id="63"></td>
-    <td id="73"></td>
-    <td id="83"></td>
-  </tr>  
-   <tr>
-    <td id="14"></td>
-    <td id="24"></td> 
-    <td id="34"></td>
-    <td id="44"></td>
-    <td id="54"></td>
-    <td id="64"></td>
-    <td id="74"></td>
-    <td id="84"></td>
-  </tr>  
-   <tr>
-    <td id="15"></td>
-    <td id="25"></td> 
-    <td id="35"></td>
-    <td id="45"></td>
-    <td id="55"></td>
-    <td id="65"></td>
-    <td id="75"></td>
-    <td id="85"></td>
-  </tr>  
-   <tr>
-    <td id="16"></td>
-    <td id="26"></td> 
-    <td id="36"></td>
-    <td id="46"></td>
-    <td id="56"></td>
-    <td id="66"></td>
-    <td id="76"></td>
-    <td id="86"></td>
-  </tr>  
-   <tr>
-    <td id="17"></td>
-    <td id="27"></td> 
-    <td id="37"></td>
-    <td id="47"></td>
-    <td id="57"></td>
-    <td id="67"></td>
-    <td id="77"></td>
-    <td id="87"></td>
-  </tr>  
-   <tr>
-    <td id="18"></td>
-    <td id="28"></td> 
-    <td id="38"></td>
-    <td id="48"></td>
-    <td id="58"></td>
-    <td id="68"></td>
-    <td id="78"></td>
-    <td id="88"></td>
-  </tr>
-</table>    
-</div>
-<h3 id="over"></h3>
-<div class="alert"><p></p></div>
-<p id="author">Nadav Hames</p>
-</section>
-<section id="restart" style='display: none;' class="animated fadeIn">
-   <div id="centerdiv">
-           <a class="btn" id="rstrtbtn" onclick="restart();">Accept Rematch</a><div class="opprstrt"><p id="ro">Opponent has not yet accepted...</p></div>
-   </div>
-</section>
-</body>
-<footer id="footer"></footer>
-</html>
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Othello — Nadav Hames</title><meta name="description" content="Two screens: one player hosts and sends an invite, the other joins with it."/><meta name="theme-color" content="#181b21" media="(prefers-color-scheme: dark)"/><meta name="theme-color" content="#fbf9f6" media="(prefers-color-scheme: light)"/><link rel="icon" href="/favicon.ico" sizes="any"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..400&amp;family=JetBrains+Mono:wght@400&amp;display=swap"/><link rel="stylesheet" href="/assets/site.css"/><script>(function () {
+    document.documentElement.classList.add('js');
+    try {
+        var s = localStorage.getItem('theme');
+        if (s === 'light' || s === 'dark') document.documentElement.setAttribute('data-theme', s);
+    } catch (e) {}
+
+    // Umami skips any browser with this key set. Visit /?notrack once on each of
+    // your own browsers so your visits aren't counted; /?track undoes it.
+    try {
+        var params = new URLSearchParams(location.search);
+        if (params.has('notrack')) localStorage.setItem('umami.disabled', '1');
+        if (params.has('track')) localStorage.removeItem('umami.disabled');
+    } catch (e) {}
+
+    // Start a refresh at the top, leaving back/forward restoration alone. This
+    // must stay 'manual' for the life of the page: setting it back to 'auto'
+    // re-arms restoration, which then undoes the scroll.
+    try {
+        var nav = performance.getEntriesByType('navigation')[0];
+        if (nav && nav.type === 'reload' && 'scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+            addEventListener('load', function () { scrollTo(0, 0); });
+        }
+    } catch (e) {}
+})();</script><script defer src="https://cloud.umami.is/script.js" data-website-id="17026d89-d1a2-47c4-989f-f265eb89d184" data-domains="nadavhames.com,www.nadavhames.com"></script></head><body><div class="marginalia" aria-hidden="true"><div class="marginalia__side marginalia__side--left"><span style="--x:8%;--y:4;--size:1.54rem;--speed:0.204;--peak:0.182;--rot:-5deg">♩</span><span style="--x:15%;--y:34;--size:1.59rem;--speed:0.212;--peak:0.186;--rot:-13deg">♬</span><span style="--x:26%;--y:73;--size:1.50rem;--speed:0.195;--peak:0.178;--rot:-7deg">♯</span><span style="--x:35%;--y:65;--size:1.41rem;--speed:0.180;--peak:0.170;--rot:2deg">♫</span><span style="--x:48%;--y:0;--size:1.09rem;--speed:0.124;--peak:0.142;--rot:1deg">♮</span><span style="--x:56%;--y:28;--size:1.85rem;--speed:0.257;--peak:0.208;--rot:-14deg">♪</span><span style="--x:65%;--y:67;--size:2.54rem;--speed:0.378;--peak:0.269;--rot:3deg">♭</span><span style="--x:72%;--y:100;--size:2.00rem;--speed:0.284;--peak:0.222;--rot:14deg">♩</span><span style="--x:84%;--y:14;--size:1.81rem;--speed:0.250;--peak:0.205;--rot:-13deg">♬</span><span style="--x:90%;--y:69;--size:1.21rem;--speed:0.145;--peak:0.153;--rot:13deg">♯</span></div><div class="marginalia__side marginalia__side--right"><span style="--x:6%;--y:3;--size:2.34rem;--speed:0.342;--peak:0.251;--rot:3deg">♫</span><span style="--x:15%;--y:22;--size:2.45rem;--speed:0.362;--peak:0.261;--rot:-5deg">♮</span><span style="--x:27%;--y:14;--size:1.82rem;--speed:0.251;--peak:0.206;--rot:-6deg">♪</span><span style="--x:33%;--y:43;--size:1.47rem;--speed:0.191;--peak:0.176;--rot:10deg">♭</span><span style="--x:42%;--y:27;--size:2.07rem;--speed:0.295;--peak:0.227;--rot:13deg">♩</span><span style="--x:53%;--y:39;--size:1.88rem;--speed:0.262;--peak:0.211;--rot:-2deg">♬</span><span style="--x:65%;--y:71;--size:2.34rem;--speed:0.342;--peak:0.251;--rot:-1deg">♯</span><span style="--x:70%;--y:69;--size:1.08rem;--speed:0.122;--peak:0.141;--rot:-5deg">♫</span><span style="--x:82%;--y:12;--size:2.35rem;--speed:0.344;--peak:0.252;--rot:-1deg">♮</span><span style="--x:90%;--y:25;--size:2.83rem;--speed:0.427;--peak:0.294;--rot:-11deg">♪</span></div></div><header class="topbar"><div class="shell topbar__inner"><a class="mark" href="/">Nadav Hames</a><nav class="nav" aria-label="Primary"><a href="/#contact" data-scroll-to="contact" data-umami-event="contact-nav">Contact</a><a class="is-cta" href="/Nadav-Hames-Resume.pdf" target="_blank" rel="noopener" data-umami-event="resume-open" data-umami-event-url="/Nadav-Hames-Resume.pdf" data-umami-event-location="project-header">Resume</a><button class="theme-toggle" type="button" aria-label="Switch colour theme"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4"></path></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.6 8.6 0 1 1 9.7 3.5a6.9 6.9 0 0 0 10.8 10.8z"></path></svg></button></nav></div></header><main class="game"><div class="shell"><a class="game__back" href="/Othello/menu.html">← Othello</a><h1 class="game__title">Othello</h1><p class="game__blurb">Two screens: one player hosts and sends an invite, the other joins with it.</p><div class="game__stage"><div class="othello-online" data-othello-online data-text-host="Host" data-text-join="Join" data-text-code-label="Game code" data-text-connect="Connect" data-text-copy-link="Copy invite link" data-text-copied="Copied" data-text-connecting="Connecting…" data-text-invite="Send your opponent the invite link, or this code to enter under Join." data-text-joining="Joining game {code}…" data-text-you-play="You play {colour}." data-text-black="black" data-text-white="white" data-text-your-turn="Your turn" data-text-their-turn="Their turn" data-text-you-pass="You have no moves, so your turn is skipped." data-text-they-pass="Your opponent has no moves. Go again." data-text-win="You win, {you} to {them}." data-text-lose="You lose, {you} to {them}." data-text-tie="It's a tie, {you} all." data-text-rematch="Rematch" data-text-rematch-sent="Waiting for your opponent to accept…" data-text-rematch-offered="Your opponent wants a rematch." data-text-left="Your opponent left the game." data-text-away="Lost contact with your opponent. Waiting for them to come back…" data-text-start-over="Start over" data-text-not-found="No game found with that code. Check it and try again." data-text-server-down="Couldn't reach the connection server. Try again in a moment." data-text-failed="The connection failed. Start over and try again."><section class="othello__lobby" data-lobby><p class="othello__note" data-unavailable hidden>Online play isn't available in this browser right now. Try <a href="/Othello/offline/othello.html" data-umami-event="project-click" data-umami-event-url="/Othello/offline/othello.html" data-umami-event-location="othello">one screen</a> instead.</p><div class="othello__actions" data-choose><button class="button" type="button" data-host disabled>Host</button><button class="button button--quiet" type="button" data-join-open disabled>Join</button></div><div class="othello__invite" data-invite hidden><p class="othello__note">Send your opponent the invite link, or this code to enter under Join.</p><div class="othello__actions"><code class="othello__code" data-code></code><button class="button button--quiet" type="button" data-copy>Copy invite link</button></div></div><form class="othello__join" data-join-form hidden><label class="control"><span>Game code</span><input class="control__input othello__code-input" name="code" required autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="12"/></label><button class="button" type="submit">Connect</button></form><p class="othello__note" data-lobby-status role="status" aria-live="polite"></p></section><section class="othello" data-game hidden><div class="othello__bar"><table id="turntable" class="othello__turn"><tbody><tr><td id="turncolor"><p id="turn">Turn</p></td></tr></tbody></table><p class="othello__message" data-you></p></div><table id="board" class="othello__board"><tbody><tr><td id="11"></td><td id="21"></td><td id="31"></td><td id="41"></td><td id="51"></td><td id="61"></td><td id="71"></td><td id="81"></td></tr><tr><td id="12"></td><td id="22"></td><td id="32"></td><td id="42"></td><td id="52"></td><td id="62"></td><td id="72"></td><td id="82"></td></tr><tr><td id="13"></td><td id="23"></td><td id="33"></td><td id="43"></td><td id="53"></td><td id="63"></td><td id="73"></td><td id="83"></td></tr><tr><td id="14"></td><td id="24"></td><td id="34"></td><td id="44"></td><td id="54"></td><td id="64"></td><td id="74"></td><td id="84"></td></tr><tr><td id="15"></td><td id="25"></td><td id="35"></td><td id="45"></td><td id="55"></td><td id="65"></td><td id="75"></td><td id="85"></td></tr><tr><td id="16"></td><td id="26"></td><td id="36"></td><td id="46"></td><td id="56"></td><td id="66"></td><td id="76"></td><td id="86"></td></tr><tr><td id="17"></td><td id="27"></td><td id="37"></td><td id="47"></td><td id="57"></td><td id="67"></td><td id="77"></td><td id="87"></td></tr><tr><td id="18"></td><td id="28"></td><td id="38"></td><td id="48"></td><td id="58"></td><td id="68"></td><td id="78"></td><td id="88"></td></tr></tbody></table><p class="othello__status" data-status role="status" aria-live="polite"></p><div class="othello__actions"><button class="button" type="button" data-rematch hidden>Rematch</button><a class="button button--quiet" href="/Othello/online/othello.html" data-start-over hidden>Start over</a></div></section></div></div></div></main><footer class="footer shell"><div class="footer__inner"><span>©<span id="year"></span> Nadav Hames</span><span><a href="/">Home</a></span></div></footer><script src="/assets/theme.js" defer></script><script src="/assets/marginalia.js" defer></script><script>// Set at view time, not build time, so the same content.ts always renders the
+// same bytes. Without JS the line reads "© Nadav Hames".
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('year').textContent = ' ' + new Date().getFullYear();
+});</script><script src="/Othello/online/game.js"></script></body></html>

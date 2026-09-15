@@ -1,480 +1,547 @@
-if (!util.supports.data) {
-    $('.no-support').show().next().hide();
-}
-var player;
-var peer;
-var peerId;
-var connect;
-var opponent = {
-    peerId: ""
-}
-var myturn = false;
+/* Two-screen Othello over a PeerJS data channel. The host plays black and moves first. */
+(function () {
+  // Pinned, with the same file on two CDNs: if the first is down, the second is tried,
+  // and if neither loads the page says online play is unavailable.
+  var PEERJS_VERSION = "1.5.5";
+  var PEERJS_SOURCES = [
+    "https://cdn.jsdelivr.net/npm/peerjs@" + PEERJS_VERSION + "/dist/peerjs.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/peerjs/" + PEERJS_VERSION + "/peerjs.min.js",
+  ];
+  var PEERJS_INTEGRITY = "sha384-x0YgkOr/3UOZP2CRDxGW9e0Q+2Qjyr3uJrm4xU32Y7ZCNAo7Cc7bjhrZMi/dwczu";
 
-function init(){
-    peer = new Peer('',{key: '55gez321n990ms4i'});
-        peer.on('open', function(id) {
-        peerId = id;
-        })
-        peer.on('error', function(err) {
-            alert('' + err);
-        }) 
-}
+  // PeerJS's free cloud server is shared by everyone, so a short code is namespaced
+  // before it becomes a peer ID. No 0/O or 1/I, which are easy to misread.
+  var ID_PREFIX = "nadavhames-othello-";
+  var CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  var CODE_LENGTH = 6;
 
-//host an join button handling
-function hostStart(){
-    init();
-    peer.on('open', function() {
-        $('#game .alert p').text('Waiting for opponent').append($('<span class="pull-right"></span>').text('Your ID: '+ peerId));
-        $('#game').show().siblings('#menu').hide();
-        alert('Send this code to player 2: ' + peerId);
-    })
-    peer.on('connection', function(c) {
-        if (connect){
-            c.close();
-            return;
-        }
-        connect = c;
-        player = 1;
-        $('#game .alert p').text('Your Turn!');
-        myturn = true;
-        start();
-    })
-}
+  var PING_EVERY = 3000;
+  var SILENCE_LIMIT = 15000;
 
-function join(){
-    init();
-    console.log(peer);
-    peer.on('open',function() {
-    var dest = prompt("Opponents ID:");
-    connect = peer.connect(dest, {
-        reliable: true
-    })
-    connect.on('open', function() {
-        opponent.peerId = dest;
-        player = 2;
-        $('#game .alert p').text("Waiting for opponents move..");
-        $('#game').show().siblings('#menu').hide();
-        myturn = false;
-        start();
-        })
-    })  
-}
+  var SIZE = 8;
+  var DIRECTIONS = [
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+    [0, -1],
+    [0, 1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
+  ];
+  var INTRO_STEP = 500;
 
-var restartPressed = false;
-function restart(){
-    restartPressed = true;
-    connect.send(['restart']);
-    if (document.getElementById("ro").innerHTML == "Opponent has accepted"){
-        if (player == 1){
-            $('#game .alert p').text('Your Turn!');
-            $('#game').show().siblings('#restart').hide();
-            myturn = true;
-            start();
-        }
-        if (player == 2){
-            $('#game .alert p').text("Waiting for opponents move..");
-            $('#game').show().siblings('#restart').hide();
-            myturn = false;
-            start();
-        }
-    } 
-}
+  var root = document.querySelector("[data-othello-online]");
+  if (!root) return;
 
-function showRestart() {
-    $('#restart').show().siblings('#game').hide().siblings('#menu').hide();
-}
-/////////////////////
-function getRandomColour() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++ ) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    if (color == 'black' || color == 'white') {
-        getRandomColour();
-    } else {
-        return color;
-    }
-}
+  // The page's wording rides along as data-text-* attributes: data-text-your-turn → copy.yourTurn.
+  var copy = {};
+  Object.keys(root.dataset).forEach(function (key) {
+    if (/^text[A-Z]/.test(key))
+      copy[key.charAt(4).toLowerCase() + key.slice(5)] = root.dataset[key];
+  });
+  var $ = function (name) {
+    return root.querySelector("[data-" + name + "]");
+  };
+  var lobby = $("lobby");
+  var choose = $("choose");
+  var hostButton = $("host");
+  var joinButton = $("join-open");
+  var invite = $("invite");
+  var codeOut = $("code");
+  var copyButton = $("copy");
+  var joinForm = $("join-form");
+  var lobbyStatus = $("lobby-status");
+  var game = $("game");
+  var youOut = $("you");
+  var status = $("status");
+  var rematchButton = $("rematch");
+  var startOver = $("start-over");
+  var turnCell = document.getElementById("turncolor");
+  var turnText = document.getElementById("turn");
+  var cells = Array.prototype.slice.call(document.querySelectorAll("#board td"));
 
-var colour;
-function newgame(){
-    //get rid of all extra events by replacing board with a clone of itself
-    var el = document.getElementById("board");
-    elClone = el.cloneNode(true);
-    el.parentNode.replaceChild(elClone,el);
-    //run the game
-    start();
-    
-}
-function start(){
-    var board = document.getElementById("board").getElementsByTagName("td");
-    var turn = document.getElementById("turntable").getElementsByTagName("td");
-    var turntxt = document.getElementById("turn");
-    colour = getRandomColour();
-    
-    //make turn text and background colour white (invisible)
-    turn[0].style.backgroundColor = "white";
-    turntxt.style.color = "white";
-    turn[0].style.border = "1px solid white";
-    
-    //Intro Animation and board set up
-    middle();
-    function middle() {
-        board[27].style.backgroundColor = colour;
-        board[28].style.backgroundColor = colour;
-        board[35].style.backgroundColor = colour;
-        board[36].style.backgroundColor = colour;
-        setTimeout(outer1, 500);
-    }
-    function outer1() {
-        board[18].style.backgroundColor = colour;
-        board[19].style.backgroundColor = colour;
-        board[20].style.backgroundColor = colour;
-        board[21].style.backgroundColor = colour;
-        board[26].style.backgroundColor = colour;
-        board[29].style.backgroundColor = colour;
-        board[34].style.backgroundColor = colour;
-        board[37].style.backgroundColor = colour;
-        board[42].style.backgroundColor = colour;
-        board[43].style.backgroundColor = colour;
-        board[44].style.backgroundColor = colour;
-        board[45].style.backgroundColor = colour;
-        setTimeout(outer2, 500);
-    }
-    function outer2() {
-        board[9].style.backgroundColor = colour;
-        board[10].style.backgroundColor = colour;
-        board[11].style.backgroundColor = colour;
-        board[12].style.backgroundColor = colour;
-        board[13].style.backgroundColor = colour;
-        board[14].style.backgroundColor = colour;
-        board[17].style.backgroundColor = colour;
-        board[22].style.backgroundColor = colour;
-        board[25].style.backgroundColor = colour;
-        board[30].style.backgroundColor = colour;
-        board[33].style.backgroundColor = colour;
-        board[38].style.backgroundColor = colour;
-        board[41].style.backgroundColor = colour;
-        board[46].style.backgroundColor = colour;
-        board[49].style.backgroundColor = colour;
-        board[50].style.backgroundColor = colour;
-        board[51].style.backgroundColor = colour;
-        board[52].style.backgroundColor = colour;
-        board[53].style.backgroundColor = colour;
-        board[54].style.backgroundColor = colour;
-        setTimeout(outer3, 500);
-    }
-    function outer3() {
-        board[0].style.backgroundColor = colour;
-        board[1].style.backgroundColor = colour;
-        board[2].style.backgroundColor = colour;
-        board[3].style.backgroundColor = colour;
-        board[4].style.backgroundColor = colour;
-        board[5].style.backgroundColor = colour;
-        board[6].style.backgroundColor = colour;
-        board[7].style.backgroundColor = colour;
-        board[8].style.backgroundColor = colour;
-        board[15].style.backgroundColor = colour;
-        board[16].style.backgroundColor = colour;
-        board[23].style.backgroundColor = colour;
-        board[24].style.backgroundColor = colour;
-        board[31].style.backgroundColor = colour;
-        board[32].style.backgroundColor = colour;
-        board[39].style.backgroundColor = colour;
-        board[40].style.backgroundColor = colour;
-        board[47].style.backgroundColor = colour;
-        board[48].style.backgroundColor = colour;
-        board[55].style.backgroundColor = colour;
-        board[56].style.backgroundColor = colour;
-        board[57].style.backgroundColor = colour;
-        board[58].style.backgroundColor = colour;
-        board[59].style.backgroundColor = colour;
-        board[60].style.backgroundColor = colour;
-        board[61].style.backgroundColor = colour;
-        board[62].style.backgroundColor = colour;
-        board[63].style.backgroundColor = colour;
-        setTimeout(centerpiece, 500);
-    }
-    function centerpiece() {
-        board[27].style.backgroundColor = "black";
-        board[28].style.backgroundColor = "white";
-        board[35].style.backgroundColor = "white";
-        board[36].style.backgroundColor = "black";
-        
-        //black player starts
-        turn[0].style.backgroundColor = "black";
-        turn[0].style.border = "1px solid black";
-        game();
-    }
-}
+  var peer = null;
+  var conn = null;
+  var isHost = false;
+  var me = null;
+  var board = [];
+  var turn = "black";
+  var boardColour = "";
+  var playing = false;
+  var over = false;
+  var wantRematch = false;
+  var theyWantRematch = false;
+  var generation = 0;
+  var gone = false;
+  var away = false;
+  var statusBeforeAway = "";
+  var lastHeard = 0;
+  var heartbeat = null;
 
-function game() {
-    var board = document.getElementById("board").getElementsByTagName("td");
-    var turn = document.getElementById("turntable").getElementsByTagName("td");
-    //is run at the start of each turn
-    //for each black/white tile on the board, check in all directions for white tiles. continue in that direction until you hit a blank tile which becomes a possible move.
-    
-    //Array that stores all possible places to move each turn
+  function canMove() {
+    return playing && !over && !away && !gone && turn === me;
+  }
+
+  function fill(template, values) {
+    return template.replace(/\{(\w+)\}/g, function (_, key) {
+      return values[key];
+    });
+  }
+
+  function other(colour) {
+    return colour === "black" ? "white" : "black";
+  }
+
+  /* ---------- rules ---------- */
+
+  function discsFlippedBy(index, colour) {
+    if (board[index]) return [];
+    var row = Math.floor(index / SIZE);
+    var col = index % SIZE;
+    var flipped = [];
+    DIRECTIONS.forEach(function (d) {
+      var run = [];
+      var r = row + d[0];
+      var c = col + d[1];
+      while (r >= 0 && r < SIZE && c >= 0 && c < SIZE && board[r * SIZE + c] === other(colour)) {
+        run.push(r * SIZE + c);
+        r += d[0];
+        c += d[1];
+      }
+      if (
+        run.length &&
+        r >= 0 &&
+        r < SIZE &&
+        c >= 0 &&
+        c < SIZE &&
+        board[r * SIZE + c] === colour
+      ) {
+        flipped = flipped.concat(run);
+      }
+    });
+    return flipped;
+  }
+
+  function legalMoves(colour) {
     var moves = [];
-    //Array that stores the path of white pieces needed to get to each place in move
-    var paths = [];
-    
-    //get opponent color
-    var opponentColor;
-    if (turn[0].style.backgroundColor == "black") {
-        opponentColor = "white";
-    } else {
-        opponentColor = "black";
-    }
-    
-    //for each piece the player has, get all possible moves.
     for (var i = 0; i < board.length; i++) {
-        var color = board[i].style.backgroundColor;
-        if (color == turn[0].style.backgroundColor) {
-            getMoves(board[i].id);
-        }
+      if (discsFlippedBy(i, colour).length) moves.push(i);
     }
-    
-    //console.log(paths);
-    //console.log(moves);
-    
-    function getMoves(id) {
-        var temppaths = [];
-        var i = 0;
-        checkdir(id,"N");
-        var i = 0;
-        checkdir(id,"NE");
-        var i = 0;
-        checkdir(id,"E");
-        var i = 0;
-        checkdir(id,"SE");
-        var i = 0;
-        checkdir(id,"S");
-        var i = 0;
-        checkdir(id,"SW");
-        var i = 0;
-        checkdir(id,"W");
-        var i = 0;
-        checkdir(id,"NW");
-        function checkdir(id, direction) {
-            if (direction == "N") {
-                newid = Number(id) - 1;
-            }
-            if (direction == "NE") {
-                newid = Number(id) + 9;
-            }
-            if (direction == "E") {
-                newid = Number(id) + 10;
-            }
-            if (direction == "SE") {
-                newid = Number(id) + 11;
-            }
-            if (direction == "S") {
-                newid = Number(id) + 1;
-            }
-            if (direction == "SW") {
-                newid = Number(id) - 9;
-            }
-            if (direction == "W") {
-                newid = Number(id) - 10;
-            }
-            if (direction == "NW") {
-                newid = Number(id) - 11;
-            } 
-            if (document.getElementById(newid)){
-                if (document.getElementById(newid).style.backgroundColor == opponentColor){
-                    i++;
-                    temppaths.push("" + newid);
-                    //console.log(temppaths + " " + i);
-                    checkdir(newid, direction);
-                } else { 
-                    if (i > 0 && document.getElementById(newid).style.backgroundColor != opponentColor) {
-                        if (document.getElementById(newid).style.backgroundColor != turn[0].style.backgroundColor) {
-                            for (var z=0; z<temppaths.length; z++){
-                            paths.push(temppaths[z]);
-                            }
-                            moves.push(newid);
-                            paths.push(newid);
-                            temppaths = [];
-                        }
-                    }
-                }
-            temppaths = [];
-            }   
-        }
-    }
-    //if no more moves for either player exist exist, endgame
-    if (moves === undefined || moves.length == 0) {
-            //console.log("game over");
-            var b = 0;
-            var w = 0;
-            for (var v = 0; v < board.length; v++) {
-                var cellColor = board[v].style.backgroundColor;
-                if (cellColor == "black") {
-                    b++;
-                    }
-                if (cellColor == "white") {
-                    w++;
-                }
-            }
-            var text = document.getElementById("over");
-            if (b > w){
-                if (player == 1){
-                    $('#game .alert p').text("You Win! ( " + b + "," + w + ")").append($('<a class="pull-right" onclick="showRestart();"></a>').text('Click here for New Game'));
-                }
-                if (player == 2){
-                    $('#game .alert p').text("You Lose! ( " + w + "," + b + ")").append($('<a class="pull-right" onclick="showRestart();"></a>').text('Click here for New Game'));
-                }   
-            }
-            if (w > b){
-                if (player == 1){
-                    $('#game .alert p').text("You Lose! ( " + b + "," + w + ")").append($('<a class="pull-right" onclick="showRestart();"></a>').text('Click here for New Game'));
-                }
-                if (player == 2){
-                    $('#game .alert p').text("You Win! ( " + w + "," + b + ")").append($('<a class="pull-right" onclick="showRestart();"></a>').text('Click here for New Game'));
-                }
-            }
-            if (w == b){
-                $('#game .alert p').text("Tie! ( " + w + "," + b + ")").append($('<a class="pull-right" onclick="showRestart();"></a>').text('Click here for New Game'));
-            }    
-    }
-    
-    connect.on('data', function(data) {
-        switch(data[0]) {
-            case 'move':
-                if (myturn == false){
-                $('#game .alert p').text('Your turn!');
-                document.getElementById(data[1]).style.backgroundColor = turn[0].style.backgroundColor;
-                myturn = true;
-                flipPieces(Number(data[1]), data[2]);
-                }
-                break;
-            case 'restart':
-                $('#restart .opprstrt p').text("Opponent has accepted");
-                if (restartPressed == true){
-                    if (player == 1){
-                        $('#game .alert p').text('Your Turn!');
-                        $('#game').show().siblings('#restart').hide();
-                        myturn = true;
-                        start();
-                    }
-                    if (player == 2){
-                        $('#game .alert p').text("Waiting for opponents move..");
-                        $('#game').show().siblings('#restart').hide();
-                        myturn = false;
-                        start();
-                    }           
-                }
-                break;
-        }
-    })
-    connect.on('close', function() {
-        if (moves !== undefined || moves.length !=0){
-            $('#game .alert p').text("Opponent has left the game!")
-        }
-        myturn = false;
-    })
-    peer.on('error', function(error) {
-        alert(''+error);
-        myturn = false;
-    })
-    
-    //for each possible move spot, mouseover will preveiw your color
-    if (myturn == true) {
-        var clicked = false;
-        document.getElementById("board").style.pointerEvents = 'auto';
-        moves.forEach(function(item, j){
-                document.getElementById(moves[j]).onmouseover = function(){
-                    if (clicked == false){
-                        document.getElementById(moves[j]).style.backgroundColor = turn[0].style.backgroundColor;
-                    }
-                }
-                document.getElementById(moves[j]).onmouseout = function(){
-                    if (clicked == false){
-                        document.getElementById(moves[j]).style.backgroundColor = colour;
-                    }
-                }
-                document.getElementById(moves[j]).onclick = function(){            
-                    clicked = true;
-                    var picked = moves[j]; //
-                    document.getElementById(moves[j]).style.backgroundColor = turn[0].style.backgroundColor;
-                    $('#game .alert p').text("Waiting for Opponents Move");
-                    myturn = false;
-                    connect.send(['move', moves[j], paths]);
-                    flipPieces(picked, paths);
-                    turnOffEvents();
-                }
+    return moves;
+  }
+
+  /* ---------- drawing ---------- */
+
+  // Discs must be literal black and white, so the board colour stays clear of both.
+  function randomBoardColour() {
+    var hue = Math.floor(Math.random() * 360);
+    return "hsl(" + hue + ", 55%, 38%)";
+  }
+
+  function render() {
+    var moves = canMove() ? legalMoves(me) : [];
+    cells.forEach(function (cell, i) {
+      cell.style.backgroundColor = board[i] || boardColour;
+      cell.classList.toggle("is-legal", moves.indexOf(i) !== -1);
+    });
+
+    turnCell.style.backgroundColor = turn;
+    turnCell.style.borderColor = turn;
+    turnText.style.color = other(turn);
+    turnText.textContent = turn === me ? copy.yourTurn : copy.theirTurn;
+  }
+
+  // Colours the board in rings from the centre outwards, then sets out the first four discs.
+  function intro(done) {
+    var run = generation;
+    cells.forEach(function (cell) {
+      cell.style.backgroundColor = "";
+      cell.classList.remove("is-legal");
+    });
+    [0, 1, 2, 3].forEach(function (ring) {
+      setTimeout(function () {
+        if (run !== generation) return;
+        cells.forEach(function (cell, i) {
+          var row = Math.floor(i / SIZE);
+          var col = i % SIZE;
+          var distance = Math.max(Math.abs(row - 3.5), Math.abs(col - 3.5)) - 0.5;
+          if (distance === ring) cell.style.backgroundColor = boardColour;
         });
+      }, ring * INTRO_STEP);
+    });
+    setTimeout(function () {
+      if (run === generation) done();
+    }, 4 * INTRO_STEP);
+  }
+
+  /* ---------- play ---------- */
+
+  function newBoard() {
+    board = [];
+    for (var i = 0; i < SIZE * SIZE; i++) board.push(null);
+    board[27] = "black";
+    board[28] = "white";
+    board[35] = "white";
+    board[36] = "black";
+  }
+
+  function begin(colour) {
+    generation++;
+    boardColour = colour;
+    newBoard();
+    turn = "black";
+    playing = false;
+    over = false;
+    wantRematch = false;
+    theyWantRematch = false;
+
+    lobby.hidden = true;
+    game.hidden = false;
+    rematchButton.hidden = true;
+    startOver.hidden = true;
+    rematchButton.disabled = false;
+    youOut.textContent = fill(copy.youPlay, { colour: copy[me] });
+    status.textContent = "";
+    turnText.textContent = "";
+    turnCell.style.backgroundColor = "";
+    turnCell.style.borderColor = "";
+
+    intro(function () {
+      playing = true;
+      render();
+    });
+  }
+
+  function play(index, colour) {
+    var flipped = discsFlippedBy(index, colour);
+    if (!flipped.length) return false;
+
+    board[index] = colour;
+    flipped.forEach(function (i) {
+      board[i] = colour;
+    });
+    status.textContent = "";
+
+    var next = other(colour);
+    if (legalMoves(next).length) {
+      turn = next;
+    } else if (legalMoves(colour).length) {
+      // The other player can't move, so the same player goes again.
+      turn = colour;
+      status.textContent = next === me ? copy.youPass : copy.theyPass;
+    } else {
+      finish();
     }
-    
-    function turnOffEvents(){
-        moves.forEach(function(item, j){
-            document.getElementById(moves[j]).style.pointerEvents = 'none';
-            //Event.onmouseover = null;
-            //Event.onmouseout = null;
-            //Event.onclick = null;
-            //console.log(document.getElementById(moves[j]).style.pointerEvents);
-        })
-        for (var m = 0; m < board.length; m++) {
-            $(document.getElementById(board[m])).unbind();
+    render();
+    return true;
+  }
+
+  function finish() {
+    over = true;
+    var mine = 0;
+    var theirs = 0;
+    board.forEach(function (disc) {
+      if (disc === me) mine++;
+      else if (disc) theirs++;
+    });
+    var template = mine > theirs ? copy.win : mine < theirs ? copy.lose : copy.tie;
+    status.textContent = fill(template, { you: mine, them: theirs });
+    rematchButton.hidden = false;
+  }
+
+  function startRematch() {
+    var colour = randomBoardColour();
+    send({ type: "start", colour: colour });
+    begin(colour);
+  }
+
+  /* ---------- connection ---------- */
+
+  function send(message) {
+    if (conn && conn.open) conn.send(message);
+  }
+
+  function setLobbyStatus(message) {
+    lobbyStatus.textContent = message || "";
+  }
+
+  function randomCode() {
+    var code = "";
+    var bytes = new Uint32Array(CODE_LENGTH);
+    crypto.getRandomValues(bytes);
+    for (var i = 0; i < CODE_LENGTH; i++) code += CODE_ALPHABET[bytes[i] % CODE_ALPHABET.length];
+    return code;
+  }
+
+  function cleanCode(value) {
+    return String(value || "")
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, "");
+  }
+
+  function inviteLink(code) {
+    return location.origin + location.pathname + "?join=" + code;
+  }
+
+  function opponentGone() {
+    if (gone || lobby.hidden === false) return;
+    gone = true;
+    clearInterval(heartbeat);
+    render();
+    status.textContent = copy.left;
+    rematchButton.hidden = true;
+    startOver.hidden = false;
+  }
+
+  // A closed tab doesn't always close the data channel, and a phone that switches apps
+  // pauses without closing anything, so both sides ping. Silence shows the opponent as
+  // away, and the game picks up again if they come back.
+  function watchOpponent() {
+    lastHeard = Date.now();
+    clearInterval(heartbeat);
+    heartbeat = setInterval(function () {
+      send({ type: "ping" });
+      var silent = Date.now() - lastHeard > SILENCE_LIMIT;
+      if (silent && !away && lobby.hidden) {
+        away = true;
+        statusBeforeAway = status.textContent;
+        status.textContent = copy.away;
+        startOver.hidden = false;
+        render();
+      }
+    }, PING_EVERY);
+  }
+
+  function heardFromOpponent() {
+    lastHeard = Date.now();
+    if (!away || gone) return;
+    away = false;
+    status.textContent = statusBeforeAway;
+    startOver.hidden = true;
+    render();
+  }
+
+  function useConnection(connection) {
+    conn = connection;
+
+    conn.on("open", watchOpponent);
+
+    conn.on("data", function (message) {
+      if (!message || typeof message !== "object") return;
+      heardFromOpponent();
+
+      if (message.type === "start" && !isHost) {
+        begin(String(message.colour));
+      } else if (message.type === "move") {
+        // Only accept a move that is the opponent's to make and legal on this board.
+        if (!playing || over || turn === me) return;
+        play(Number(message.index), turn);
+      } else if (message.type === "rematch" && over) {
+        theyWantRematch = true;
+        if (wantRematch) {
+          if (isHost) startRematch();
+        } else {
+          status.textContent = copy.rematchOffered;
         }
+      }
+    });
+
+    conn.on("close", opponentGone);
+    conn.on("error", opponentGone);
+    conn.on("iceStateChanged", function (state) {
+      if (state === "failed" || state === "closed") opponentGone();
+    });
+  }
+
+  function explain(error) {
+    var type = error && error.type;
+    if (type === "peer-unavailable") return copy.notFound;
+    if (
+      type === "network" ||
+      type === "server-error" ||
+      type === "socket-error" ||
+      type === "socket-closed"
+    ) {
+      return copy.serverDown;
     }
-    
-    function flipPieces(m, paths) {
-        //console.log(paths + "in flip");
-        var upperbound;
-        var lowerbound;
-        
-        //returns all indexes of paths that contain the move coord
-        //console.log(paths);
-        function getAllIndexes(m){
-            var indexes = [], n;
-            for (n=0;n<paths.length;n++){
-                if (paths[n] === m)
-                    indexes.push(n);
-            }
-            //console.log(indexes);
-            return indexes;
-        }
-        
-        var indexes = getAllIndexes(m);
-        //console.log(indexes);
-        
-        for (i=0; i<indexes.length; i++){
-            for (var j = indexes[i]-1; j>=0; j--){
-            if (j==0){
-                upperbound = indexes[i];
-                lowerbound = 0;
-                break;
-            }
-            if (typeof paths[j] === 'number'){
-                upperbound = indexes[i];
-                lowerbound = j + 1;
-                break;
-                }
-            }   
-            for (var k=lowerbound; k<upperbound; k++){
-                document.getElementById(paths[k]).style.backgroundColor = turn[0].style.backgroundColor;
-            }
-        }
-        //console.log(upperbound + " " + lowerbound);
-        switchTurn();
+    return copy.failed;
+  }
+
+  function resetLobby() {
+    if (peer) peer.destroy();
+    peer = null;
+    conn = null;
+    choose.hidden = false;
+    hostButton.disabled = false;
+    joinButton.disabled = false;
+    invite.hidden = true;
+  }
+
+  function host(attempt) {
+    attempt = attempt || 0;
+    isHost = true;
+    me = "black";
+    var code = randomCode();
+
+    choose.hidden = true;
+    joinForm.hidden = true;
+    setLobbyStatus(copy.connecting);
+
+    peer = new window.peerjs.Peer(ID_PREFIX + code);
+
+    peer.on("open", function () {
+      codeOut.textContent = code;
+      invite.hidden = false;
+      setLobbyStatus("");
+    });
+
+    peer.on("connection", function (connection) {
+      // A game has two players; anyone else who finds the code is turned away.
+      if (conn) {
+        connection.on("open", function () {
+          connection.close();
+        });
+        return;
+      }
+      useConnection(connection);
+      connection.on("open", startRematch);
+    });
+
+    peer.on("error", function (error) {
+      if (error.type === "unavailable-id" && attempt < 3) {
+        peer.destroy();
+        host(attempt + 1);
+        return;
+      }
+      if (conn && conn.open) return; // the game itself carries on without the server
+      resetLobby();
+      setLobbyStatus(explain(error));
+    });
+  }
+
+  function join(code) {
+    isHost = false;
+    me = "white";
+
+    choose.hidden = true;
+    joinForm.hidden = true;
+    setLobbyStatus(fill(copy.joining, { code: code }));
+
+    peer = new window.peerjs.Peer();
+
+    peer.on("open", function () {
+      useConnection(peer.connect(ID_PREFIX + code, { reliable: true, serialization: "json" }));
+    });
+
+    peer.on("error", function (error) {
+      if (conn && conn.open) return;
+      resetLobby();
+      joinForm.hidden = false;
+      joinForm.elements.code.value = code;
+      setLobbyStatus(explain(error));
+    });
+  }
+
+  /* ---------- controls ---------- */
+
+  hostButton.addEventListener("click", function () {
+    host(0);
+  });
+
+  joinButton.addEventListener("click", function () {
+    choose.hidden = true;
+    joinForm.hidden = false;
+    setLobbyStatus("");
+    joinForm.elements.code.focus();
+  });
+
+  joinForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+    var code = cleanCode(joinForm.elements.code.value);
+    if (code) join(code);
+  });
+
+  copyButton.addEventListener("click", function () {
+    var link = inviteLink(codeOut.textContent);
+    var label = copy.copyLink;
+    var done = function () {
+      copyButton.textContent = copy.copied;
+      setTimeout(function () {
+        copyButton.textContent = label;
+      }, 1600);
+    };
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(link).then(done, function () {
+        window.prompt("", link);
+      });
+    } else {
+      window.prompt("", link);
     }
-    function switchTurn() {
-            var turntxt = document.getElementById("turn");
-            if (turn[0].style.backgroundColor == "white"){
-                turn[0].style.backgroundColor = "black";
-                turntxt.style.color = "white";
-            } else {
-              if (turn[0].style.backgroundColor == "black") {
-                turn[0].style.backgroundColor = "white";
-                turntxt.style.color = "black";
-            }  
-            }
-            moves = [];
-            paths = [];
-            indexes = [];
-            game();
-        }
-}
+  });
+
+  cells.forEach(function (cell, index) {
+    cell.addEventListener("mouseenter", function () {
+      if (cell.classList.contains("is-legal")) cell.style.backgroundColor = me;
+    });
+    cell.addEventListener("mouseleave", function () {
+      if (cell.classList.contains("is-legal")) cell.style.backgroundColor = boardColour;
+    });
+    cell.addEventListener("click", function () {
+      if (!canMove() || !cell.classList.contains("is-legal")) return;
+      if (play(index, me)) send({ type: "move", index: index });
+    });
+  });
+
+  rematchButton.addEventListener("click", function () {
+    wantRematch = true;
+    rematchButton.disabled = true;
+    send({ type: "rematch" });
+    if (theyWantRematch) {
+      if (isHost) startRematch();
+    } else {
+      status.textContent = copy.rematchSent;
+    }
+  });
+
+  // Closing the tab tells the other player straight away rather than after a timeout.
+  window.addEventListener("pagehide", function () {
+    if (peer) peer.destroy();
+  });
+
+  /* ---------- start ---------- */
+
+  function loadPeerJs(index, done) {
+    if (window.peerjs) return done();
+    if (index >= PEERJS_SOURCES.length) return done();
+    var script = document.createElement("script");
+    script.src = PEERJS_SOURCES[index];
+    script.integrity = PEERJS_INTEGRITY;
+    script.crossOrigin = "anonymous";
+    script.onload = done;
+    script.onerror = function () {
+      script.remove();
+      loadPeerJs(index + 1, done);
+    };
+    document.head.appendChild(script);
+  }
+
+  loadPeerJs(0, function () {
+    if (!window.peerjs || !window.peerjs.util.supports.data) {
+      choose.hidden = true;
+      $("unavailable").hidden = false;
+      return;
+    }
+
+    hostButton.disabled = false;
+    joinButton.disabled = false;
+
+    // Opened from an invite link: join straight away, and drop the code from the
+    // address so a refresh doesn't try to rejoin a game that has moved on.
+    var invited = cleanCode(new URLSearchParams(location.search).get("join"));
+    if (invited) {
+      history.replaceState(null, "", location.pathname);
+      join(invited);
+    }
+  });
+})();

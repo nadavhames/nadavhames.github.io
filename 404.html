@@ -1,126 +1,31 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="chrome=1">
-        <meta name="HandheldFriendly" content="True">
-        <meta name="MobileOptimized" content="320">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="referrer" content="no-referrer">
+<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Not found — Nadav Hames</title><meta name="robots" content="noindex"/><meta name="theme-color" content="#181b21" media="(prefers-color-scheme: dark)"/><meta name="theme-color" content="#fbf9f6" media="(prefers-color-scheme: light)"/><link rel="icon" href="/favicon.ico" sizes="any"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..400&amp;family=JetBrains+Mono:wght@400&amp;display=swap"/><link rel="stylesheet" href="/assets/site.css"/><script>(function () {
+    document.documentElement.classList.add('js');
+    try {
+        var s = localStorage.getItem('theme');
+        if (s === 'light' || s === 'dark') document.documentElement.setAttribute('data-theme', s);
+    } catch (e) {}
 
-        <link rel="stylesheet" href="https:&#x2F;&#x2F;nadavhames.com&#x2F;fonts.css">
-        <link rel="stylesheet" href="https:&#x2F;&#x2F;nadavhames.com&#x2F;style.css">
+    // Umami skips any browser with this key set. Visit /?notrack once on each of
+    // your own browsers so your visits aren't counted; /?track undoes it.
+    try {
+        var params = new URLSearchParams(location.search);
+        if (params.has('notrack')) localStorage.setItem('umami.disabled', '1');
+        if (params.has('track')) localStorage.removeItem('umami.disabled');
+    } catch (e) {}
 
-        <title>
-    404 - Not found
-</title>
-
-        
-    </head>
-    <body>
-        
-    <div class="wrap">
-        <div class="section" id="title">
-            
-    Not found
-
-        </div>
-        <div class="section" id="content">
-            
-<p>
-    Oops, looks like this content is not available.
-    <br>
-    <a href="https:&#x2F;&#x2F;nadavhames.com">home</a>
-    </p>
-
-        </div>
-        
-    <div class="section bottom-menu">
-        <hr/>
-        <p>
-            
-                
-                    <a href="&#x2F;">about me</a>
-                    &#183;
-                
-                    <a href="#Projects">projects</a>
-                    &#183;
-                
-                    <a href="https:&#x2F;&#x2F;github.com&#x2F;nadavhames">github</a>
-                    &#183;
-                
-                    <a href="https:&#x2F;&#x2F;resume.creddle.io&#x2F;resume&#x2F;dy7a2wfc1zq">resume</a>
-                    &#183;
-                
-            
-            <a href="https:&#x2F;&#x2F;nadavhames.com">
-                home
-            </a>
-        </p>
-    </div>
-
-        
-    
-
-    </div>
-
-    </body>
-    <script>
-	 	 var TxtType = function(el, toRotate, period) {
-			  this.toRotate = toRotate;
-			  this.el = el;
-			  this.loopNum = 0;
-			  this.period = parseInt(period, 10) || 2000;
-			  this.txt = '';
-			  this.tick();
-			  this.isDeleting = false;
-		 };
-
-		 TxtType.prototype.tick = function() {
-			  var i = this.loopNum % this.toRotate.length;
-			  var fullTxt = this.toRotate[i];
-
-			  if (this.isDeleting) {
-				this.txt = fullTxt.substring(0, this.txt.length - 1);
-			  } else {
-				this.txt = fullTxt.substring(0, this.txt.length + 1);
-			  }
-
-			  this.el.innerHTML = '<span class="wrap">'+this.txt+'</span>';
-
-			  var that = this;
-			  var delta = 200 - Math.random() * 100;
-
-			  if (this.isDeleting) { delta /= 2; }
-
-			  if (!this.isDeleting && this.txt === fullTxt) {
-				delta = this.period;
-				this.isDeleting = true;
-			  } else if (this.isDeleting && this.txt === '') {
-				this.isDeleting = false;
-				this.loopNum++;
-				delta = 500;
-			  }
-
-			  setTimeout(function() {
-			  that.tick();
-			  }, delta);
-		 };
-
-		 window.onload = function() {
-		     var elements = document.getElementsByClassName('typewrite');
-		     for (var i=0; i<elements.length; i++) {
-		         var toRotate = elements[i].getAttribute('data-type');
-		         var period = elements[i].getAttribute('data-period');
-		         if (toRotate) {
-		           new TxtType(elements[i], JSON.parse(toRotate), period);
-		         }
-		     }
-		     // INJECT CSS
-		     var css = document.createElement("style");
-		     css.type = "text/css";
-		     css.innerHTML = ".typewrite > .wrap { border-right: 0.08em solid #fff}";
-		     document.body.appendChild(css);
-		 };
-    </script>
-</html>
+    // Start a refresh at the top, leaving back/forward restoration alone. This
+    // must stay 'manual' for the life of the page: setting it back to 'auto'
+    // re-arms restoration, which then undoes the scroll.
+    try {
+        var nav = performance.getEntriesByType('navigation')[0];
+        if (nav && nav.type === 'reload' && 'scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+            addEventListener('load', function () { scrollTo(0, 0); });
+        }
+    } catch (e) {}
+})();</script><script defer src="https://cloud.umami.is/script.js" data-website-id="17026d89-d1a2-47c4-989f-f265eb89d184" data-domains="nadavhames.com,www.nadavhames.com"></script></head><body><div class="marginalia" aria-hidden="true"><div class="marginalia__side marginalia__side--left"><span style="--x:8%;--y:4;--size:1.54rem;--speed:0.204;--peak:0.182;--rot:-5deg">♩</span><span style="--x:15%;--y:34;--size:1.59rem;--speed:0.212;--peak:0.186;--rot:-13deg">♬</span><span style="--x:26%;--y:73;--size:1.50rem;--speed:0.195;--peak:0.178;--rot:-7deg">♯</span><span style="--x:35%;--y:65;--size:1.41rem;--speed:0.180;--peak:0.170;--rot:2deg">♫</span><span style="--x:48%;--y:0;--size:1.09rem;--speed:0.124;--peak:0.142;--rot:1deg">♮</span><span style="--x:56%;--y:28;--size:1.85rem;--speed:0.257;--peak:0.208;--rot:-14deg">♪</span><span style="--x:65%;--y:67;--size:2.54rem;--speed:0.378;--peak:0.269;--rot:3deg">♭</span><span style="--x:72%;--y:100;--size:2.00rem;--speed:0.284;--peak:0.222;--rot:14deg">♩</span><span style="--x:84%;--y:14;--size:1.81rem;--speed:0.250;--peak:0.205;--rot:-13deg">♬</span><span style="--x:90%;--y:69;--size:1.21rem;--speed:0.145;--peak:0.153;--rot:13deg">♯</span></div><div class="marginalia__side marginalia__side--right"><span style="--x:6%;--y:3;--size:2.34rem;--speed:0.342;--peak:0.251;--rot:3deg">♫</span><span style="--x:15%;--y:22;--size:2.45rem;--speed:0.362;--peak:0.261;--rot:-5deg">♮</span><span style="--x:27%;--y:14;--size:1.82rem;--speed:0.251;--peak:0.206;--rot:-6deg">♪</span><span style="--x:33%;--y:43;--size:1.47rem;--speed:0.191;--peak:0.176;--rot:10deg">♭</span><span style="--x:42%;--y:27;--size:2.07rem;--speed:0.295;--peak:0.227;--rot:13deg">♩</span><span style="--x:53%;--y:39;--size:1.88rem;--speed:0.262;--peak:0.211;--rot:-2deg">♬</span><span style="--x:65%;--y:71;--size:2.34rem;--speed:0.342;--peak:0.251;--rot:-1deg">♯</span><span style="--x:70%;--y:69;--size:1.08rem;--speed:0.122;--peak:0.141;--rot:-5deg">♫</span><span style="--x:82%;--y:12;--size:2.35rem;--speed:0.344;--peak:0.252;--rot:-1deg">♮</span><span style="--x:90%;--y:25;--size:2.83rem;--speed:0.427;--peak:0.294;--rot:-11deg">♪</span></div></div><header class="topbar"><div class="shell topbar__inner"><a class="mark" href="/">Nadav Hames</a><nav class="nav" aria-label="Primary"><a href="/#contact" data-scroll-to="contact" data-umami-event="contact-nav">Contact</a><a class="is-cta" href="/Nadav-Hames-Resume.pdf" target="_blank" rel="noopener" data-umami-event="resume-open" data-umami-event-url="/Nadav-Hames-Resume.pdf" data-umami-event-location="404-header">Resume</a><button class="theme-toggle" type="button" aria-label="Switch colour theme"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4"></path></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.6 8.6 0 1 1 9.7 3.5a6.9 6.9 0 0 0 10.8 10.8z"></path></svg></button></nav></div></header><main class="notfound"><div class="shell"><button class="notfound__code" type="button" data-echo-open aria-controls="echo" aria-expanded="false">404</button><h1 class="notfound__rest">Oops</h1><p class="notfound__blurb">There's nothing at this address.</p><p class="notfound__links"><a href="/">Home</a> <span class="sep">/</span> <a href="/Nadav-Hames-Resume.pdf" target="_blank" rel="noopener" data-umami-event="resume-open" data-umami-event-url="/Nadav-Hames-Resume.pdf" data-umami-event-location="404">Resume</a> <span class="sep">/</span> <a href="mailto:nddhames@gmail.com" data-umami-event="email-click" data-umami-event-url="mailto:nddhames@gmail.com" data-umami-event-location="404">Email</a></p><section class="echo" id="echo" hidden aria-label="Echo" data-echo data-listen="Listen…" data-your-turn="Your turn" data-over="Missed a note. Score: {score}." data-new-best="New best score: {score}!" data-again="Again"><p class="echo__best">Best <b data-echo-best>0</b></p><div class="echo__stage"><svg class="echo__ring" viewBox="0 0 200 200"><path class="echo__pad" d="M 50.89 22.20 A 92 92 0 0 1 149.11 22.20 L 124.32 56.31 A 50 50 0 0 0 75.68 56.31 Z" role="button" tabindex="-1" aria-disabled="true" aria-label="Note 1" data-echo-pad="0" style="--i:0;--hue:var(--echo-1);--dx:0.000;--dy:-1.000"></path><path class="echo__pad" d="M 158.82 29.26 A 92 92 0 0 1 189.17 122.66 L 149.06 109.63 A 50 50 0 0 0 134.03 63.37 Z" role="button" tabindex="-1" aria-disabled="true" aria-label="Note 2" data-echo-pad="1" style="--i:1;--hue:var(--echo-2);--dx:0.951;--dy:-0.309"></path><path class="echo__pad" d="M 185.46 134.08 A 92 92 0 0 1 106.00 191.80 L 106.00 149.64 A 50 50 0 0 0 145.36 121.05 Z" role="button" tabindex="-1" aria-disabled="true" aria-label="Note 3" data-echo-pad="2" style="--i:2;--hue:var(--echo-3);--dx:0.588;--dy:0.809"></path><path class="echo__pad" d="M 94.00 191.80 A 92 92 0 0 1 14.54 134.08 L 54.64 121.05 A 50 50 0 0 0 94.00 149.64 Z" role="button" tabindex="-1" aria-disabled="true" aria-label="Note 4" data-echo-pad="3" style="--i:3;--hue:var(--echo-4);--dx:-0.588;--dy:0.809"></path><path class="echo__pad" d="M 10.83 122.66 A 92 92 0 0 1 41.18 29.26 L 65.97 63.37 A 50 50 0 0 0 50.94 109.63 Z" role="button" tabindex="-1" aria-disabled="true" aria-label="Note 5" data-echo-pad="4" style="--i:4;--hue:var(--echo-5);--dx:-0.951;--dy:-0.309"></path></svg><div class="echo__hub"><button class="echo__start" type="button" data-echo-start>Play</button><span class="echo__round" data-echo-round hidden>0</span></div></div><p class="echo__status" role="status" aria-live="polite" data-echo-status></p></section></div></main><footer class="footer shell"><div class="footer__inner"><span>©<span id="year"></span> Nadav Hames</span><span><a href="/">Home</a></span></div></footer><script src="/assets/theme.js" defer></script><script src="/assets/marginalia.js" defer></script><script>// Set at view time, not build time, so the same content.ts always renders the
+// same bytes. Without JS the line reads "© Nadav Hames".
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('year').textContent = ' ' + new Date().getFullYear();
+});</script><script src="/assets/echo.js" defer></script></body></html>

@@ -19,7 +19,7 @@
     bar: 0.9,
     accidental: 0.7,
   };
-  var PEN = { base: 0.1, perRootPx: 0.045, lift: 0.06, between: 0.18, letter: 0.04 };
+  var PEN = { base: 0.075, perRootPx: 0.034, lift: 0.045, between: 0.14, letter: 0.03 };
 
   function headY(pitch) {
     return BOTTOM_LINE - pitch * HALF_SPACE;

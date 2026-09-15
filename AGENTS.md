@@ -233,8 +233,8 @@ Musical symbols fill the space beside the page column and move with parallax on 
 ## Handwritten staffs
 
 Both staffs on the home page have music written onto them in amber ink, stroke by stroke, as if
-with a pen: the masthead's as the page loads (about 30 seconds, after the printed clef), the
-footer's once it scrolls into view (about 27 seconds, closing on the final barline). Both are in
+with a pen: the masthead's as the page loads (about 23 seconds, after the printed clef), the
+footer's once it scrolls into view (about 20 seconds, closing on the final barline). Both are in
 4/4 and deliberately different:
 
 - **Masthead** (`mastheadScore`): an opening — handwritten 4/4, _mf_, stems-down beams, a flat, an

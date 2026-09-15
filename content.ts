@@ -60,6 +60,90 @@ export const marginalia = {
   perSide: 10,
 };
 
+/**
+ * Scores handwritten onto the two staffs, both in 4/4. Pitch counts staff steps up from the
+ * bottom line: 0 is E, 2 is G on the second line, 4 is B on the middle line, 8 is F on the top
+ * line; below 0 or above 8 gets ledger lines. Stems point down from the middle line up, as in
+ * print; beamed groups and chords take the direction of their average.
+ */
+export type ScoreEvent =
+  | {
+      note: "whole" | "half" | "quarter" | "eighth";
+      /** One pitch, or several for a chord. */
+      pitch: number | number[];
+      accidental?: "sharp" | "flat" | "natural";
+      /** Joins eighth notes: "start" on the first, "end" on the last. */
+      beam?: "start" | "end";
+      /** A slur from a "start" note to its "end" note. */
+      slur?: "start" | "end";
+      /** Tie this note to the next one. */
+      tie?: true;
+    }
+  | { rest: "quarter" | "eighth" }
+  | { bar: true }
+  /** A handwritten treble clef, for a staff without a printed one. */
+  | { clef: "treble" }
+  | { time: "4/4" }
+  /** Handwritten performance text, written at the next note. Letters a–z and "." only. */
+  | { text: string; place: "above" | "below" };
+
+/**
+ * Written under the masthead as the page loads, after the printed clef: an opening in 4/4 with
+ * stems-down beams, a slur above, flat, natural, eighth rest and a tie within the bar.
+ */
+export const mastheadScore: ScoreEvent[] = [
+  { time: "4/4" },
+  { text: "mf", place: "below" },
+  { note: "quarter", pitch: 7 },
+  { note: "eighth", pitch: 6, beam: "start" },
+  { note: "eighth", pitch: 5, beam: "end" },
+  { note: "quarter", pitch: 4, accidental: "flat" },
+  { rest: "eighth" },
+  { note: "eighth", pitch: 3 },
+  { bar: true },
+  { note: "quarter", pitch: [2, 4, 6] },
+  // Under the beamed run, whose stems stay inside the staff, not the chord's long stem.
+  { text: "cresc.", place: "below" },
+  { note: "eighth", pitch: 8, beam: "start", slur: "start" },
+  { note: "eighth", pitch: 7 },
+  { note: "eighth", pitch: 6 },
+  { note: "eighth", pitch: 5, beam: "end", slur: "end" },
+  { note: "quarter", pitch: 4, accidental: "natural" },
+  { bar: true },
+  { note: "half", pitch: 3, tie: true },
+  { note: "quarter", pitch: 3 },
+  { note: "quarter", pitch: 5 },
+  { bar: true },
+];
+
+/**
+ * Written onto the footer staff once it scrolls into view. It closes on the footer's final
+ * barline, so it is written as an ending: rising stems-up beams under a slur, a sharp, a tie
+ * across the barline, chords, and a final chord.
+ */
+export const footerScore: ScoreEvent[] = [
+  { clef: "treble" },
+  { text: "p", place: "below" },
+  { note: "eighth", pitch: 2, beam: "start", slur: "start" },
+  { note: "eighth", pitch: 3 },
+  { note: "eighth", pitch: 4 },
+  { note: "eighth", pitch: 5, beam: "end", slur: "end" },
+  { note: "quarter", pitch: 6 },
+  { rest: "quarter" },
+  { bar: true },
+  { note: "quarter", pitch: 1, accidental: "sharp" },
+  { note: "quarter", pitch: 2 },
+  { note: "half", pitch: 5, tie: true },
+  { bar: true },
+  { note: "quarter", pitch: 5 },
+  { note: "eighth", pitch: 4, beam: "start" },
+  { note: "eighth", pitch: 3, beam: "end" },
+  { note: "half", pitch: [0, 2, 4] },
+  { bar: true },
+  { text: "rit.", place: "above" },
+  { note: "whole", pitch: [-2, 0, 2] },
+];
+
 export const work = [
   {
     role: "Co-Founder",

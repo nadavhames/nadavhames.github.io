@@ -39,6 +39,9 @@ assets/resume-peek.js      hover preview of the résumé PDF
 assets/marginalia.js       parallax for the margin symbols
 assets/contact.js          sends the contact form inline
 assets/echo.js             the 404 page's easter egg
+assets/staff-writing.js    lays out and writes both staffs' scores
+handwriting.ts             GENERATED pen strokes for the staffs (see Handwritten staffs)
+scripts/                   one-off generators, never deployed
 Nadav-Hames-Resume.pdf     the résumé
 dev.ts                     local dev server with live reload (never deployed)
 package.json               bun scripts: dev, build, check, format
@@ -227,6 +230,55 @@ Musical symbols fill the space beside the page column and move with parallax on 
 - Use Basic Multilingual Plane symbols only (♩ ♪ ♫ ♬ ♭ ♮ ♯); clefs render as empty boxes in most
   fonts.
 
+## Handwritten staffs
+
+Both staffs on the home page have music written onto them in amber ink, stroke by stroke, as if
+with a pen: the masthead's as the page loads (about 30 seconds, after the printed clef), the
+footer's once it scrolls into view (about 27 seconds, closing on the final barline). Both are in
+4/4 and deliberately different:
+
+- **Masthead** (`mastheadScore`): an opening — handwritten 4/4, _mf_, stems-down beams, a flat, an
+  eighth rest, a chord, _cresc._ under a four-note run slurred from above, a natural, a tie within
+  the bar, and a closing barline.
+- **Footer** (`footerScore`): an ending — handwritten clef, _p_, rising stems-up beams slurred from
+  below, a sharp, a tie across the barline, an open chord, _rit._, and a whole-note chord with a
+  ledger line.
+
+Keep them distinct if you edit either. Scores are typed `ScoreEvent`s in `content.ts`: notes with a
+pitch or a chord, accidental, beam and slur start/end, tie; rests; bars; clef; time; text above or
+below. Pitch counts staff steps up from the bottom line (0 E, 2 G, 4 B, 8 F); stems point down from
+the middle line up, and beamed groups and chords follow their average. Check each bar adds to 4
+beats. Attach text to a note whose stem stays inside the staff, or it collides.
+
+- **The strokes are real handwriting.** Music comes from HOMUS (Handwritten Online Musical Symbols;
+  Calvo-Zaragoza & Oncina, ICPR 2014; revised copy at github.com/apacha/Homus), which recorded
+  musicians' stylus paths in writing order. Every symbol is by one musician (no. 4), cycling through
+  their four drawings of each. HOMUS has no stated licence. Text comes from UJI Pen Characters v2
+  (Llorens et al., LREC 2008; UCI repository, **CC BY 4.0 — attribution required**), letters by
+  writer W14; only a–z and "." exist. Both are credited in `handwriting.ts`, each staff's `<desc>`,
+  and here.
+- **HOMUS has no slurs, ties, beams, chords or text**, so they're assembled from musician 4's
+  strokes: chords and beamed notes from separately drawn heads and stems (`parts`), stems stretched
+  to meet the beam (stems-down ones are the same strokes turned round); slurs and ties from the
+  levelled upper arc of whole-note loops (`arcs`); beams and ledger lines from a barline turned on
+  its side (`beams`). A beam is two passes of one shape, with wobble capped at a short barline's so
+  long beams stay smooth.
+- **`handwriting.ts` is generated** by `scripts/extract-handwriting.ts` from a downloaded HOMUS
+  directory and `ujipenchars2.txt` (neither is in the repo). Edit `SAMPLES`, `MUSICIAN` or `WRITER`
+  there and rerun it with both paths.
+- **Laid out in the browser** by `assets/staff-writing.js`, because slurs, ties and beams join notes
+  whose pixel positions depend on each staff's width. Each staff is `StaffWriting` in `build.tsx`
+  (`data-staff-writing` names its score, `data-start` is `load` or `view`); the scores and only the
+  strokes they use are inlined once as JSON (`StaffWritingData`). Clef and time signature take fixed
+  room so narrow screens squeeze the notes instead. When the staff changes width (a ResizeObserver, so scrollbars and
+  reflows count too) every stroke is re-laid and eases to its new shape each frame; paths are
+  reshaped in place, so writing in progress carries on. Layout must never add or drop a stroke, only
+  move them. Without JavaScript the staffs are empty.
+- **Animation is CSS**: `pathLength="1"` plus a dash offset reveals each stroke, delayed until the
+  one before is done; strokes start transparent so round caps don't leave dots early. Timing is
+  `PEN` in the script — duration grows with the square root of stroke length, so scribbled note
+  heads don't crawl. With reduced motion the music is simply there. Shared styles are `.ink`.
+
 ## Templating
 
 `build.tsx` is JSX rendered by
@@ -234,7 +286,7 @@ Musical symbols fill the space beside the page column and move with parallax on 
 autocomplete, type checking and escaping by default.
 
 - Raw markup only via `dangerouslySetInnerHTML`, used just for the static inline `BOOT` and `YEAR`
-  scripts.
+  scripts and the staff-writing JSON (which escapes `<`).
 - `prose()` parses the inline markup into nodes rather than an HTML string, keeping escaping
   intact.
 - Output is compact (no whitespace between tags); where a space matters, use explicit `{" "}`.
@@ -244,8 +296,22 @@ autocomplete, type checking and escaping by default.
 
 ## Design notes
 
-Set like a printed programme note: one narrow measure, section labels hanging in the left margin,
-hairline rules, dates in a monospaced column.
+Clean and printed rather than atmospheric: the look borrows from engraved sheet music. One narrow
+measure, hairline rules, dates in a monospaced column, and:
+
+- **Palette** — near-neutral ink and paper with a single amber accent (the owner prefers amber;
+  don't swap it). No glows, gradients or soft shadows; the only shadow is the crisp `--shadow-pop` on the
+  résumé preview.
+- **Staff** — a five-line staff (`--staff`, drawn with gradients, 5px spacing) opens the page under
+  the masthead with a barline and treble clef, and the footer closes on one ending in a final
+  double barline. The clef is Noto Music's outline (OFL) embedded as an SVG mask in `--clef`, so
+  it takes the theme colour and needs no font; its size and offset are tied to the 5px spacing,
+  so change them together.
+- **Rehearsal marks** — section labels are boxed mono caps hanging in the left margin.
+- **Margin symbols** print in `--muted` ink, not the accent.
+
+Keep new elements within this vocabulary (hairlines, boxes, staff motifs, one accent) rather than
+adding decoration.
 
 Layout comes from four tokens in `assets/site.css`: `--measure` (text column), `--label` (hanging
 label column), `--gutter`, and `--pad` (page margin). `--pad` sits outside the other three, so

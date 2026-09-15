@@ -24,7 +24,10 @@ import {
   notFound,
   marginalia,
   games,
+  mastheadScore,
+  footerScore,
 } from "./content";
+import { handwriting, parts, arcs, beams, letters } from "./handwriting";
 
 /* ---------- prose -------------------------------------------------------- */
 
@@ -165,8 +168,8 @@ function Head({ title, children }: { title: string; children?: ComponentChildren
       <title>{title}</title>
       {children}
       {/* Keep in step with --bg in assets/site.css. */}
-      <meta name="theme-color" content="#181b21" media="(prefers-color-scheme: dark)" />
-      <meta name="theme-color" content="#fbf9f6" media="(prefers-color-scheme: light)" />
+      <meta name="theme-color" content="#16171a" media="(prefers-color-scheme: dark)" />
+      <meta name="theme-color" content="#fafaf8" media="(prefers-color-scheme: light)" />
 
       <link rel="icon" href="/favicon.ico" sizes="any" />
 
@@ -295,10 +298,11 @@ function TopBar({ children }: { children: ComponentChildren }) {
   );
 }
 
-function Footer({ children }: { children: ComponentChildren }) {
+function Footer({ children, score }: { children: ComponentChildren; score?: boolean }) {
   return (
     <footer class="footer shell">
       <div class="footer__inner">
+        {score && <StaffWriting score="footer" start="view" class="staff-writing" />}
         <span>
           &copy;
           <span id="year" /> {masthead.name}
@@ -317,6 +321,7 @@ function Scripts({ home, notFound: isNotFound }: { home?: boolean; notFound?: bo
       <script dangerouslySetInnerHTML={{ __html: YEAR }} />
       {home && <script src="/assets/resume-peek.js" defer />}
       {home && <script src="/assets/contact.js" defer />}
+      {home && <script src="/assets/staff-writing.js" defer />}
       {isNotFound && <script src="/assets/echo.js" defer />}
     </>
   );
@@ -372,6 +377,82 @@ function Marginalia() {
       <MarginSide side="left" rand={rand} />
       <MarginSide side="right" rand={rand} />
     </div>
+  );
+}
+
+/* ---------- handwritten staffs ------------------------------------------- */
+
+const HANDWRITING_CREDIT = `Handwritten music by one musician from the HOMUS dataset (Calvo-Zaragoza
+  and Oncina, ICPR 2014) and lettering by one writer from UJI Pen Characters v2 (Llorens et al.,
+  LREC 2008, CC BY 4.0), replayed stroke by stroke.`;
+
+/**
+ * A staff's writing surface; assets/staff-writing.js fills it with the score named by `score`.
+ * `start` is when the pen begins: as the page loads, or once the staff scrolls into view.
+ */
+function StaffWriting({
+  score,
+  start,
+  class: className,
+  delay,
+}: {
+  score: keyof typeof scores;
+  start: "load" | "view";
+  class: string;
+  delay?: number;
+}) {
+  return (
+    <svg
+      class={`${className} ink`}
+      aria-hidden="true"
+      data-staff-writing={score}
+      data-start={start}
+      data-delay={delay}
+    >
+      <desc>{collapse(HANDWRITING_CREDIT)}</desc>
+    </svg>
+  );
+}
+
+const scores = { masthead: mastheadScore, footer: footerScore };
+
+/**
+ * Everything assets/staff-writing.js needs: the scores and the strokes they draw from. JSON can't
+ * be escaped as HTML, so "<" is written as < instead, which keeps "</script>" in any string
+ * from closing the tag.
+ */
+function staffWritingData(): string {
+  const all = Object.values(scores).flat();
+  const letterSet = new Set(
+    all.flatMap((e) => ("text" in e ? [...e.text] : [])).filter((c) => letters[c]),
+  );
+  const noteKinds = [
+    "quarter-up",
+    "quarter-down",
+    "half-up",
+    "half-down",
+    "eighth-up",
+    "eighth-down",
+  ] as const;
+  return JSON.stringify({
+    scores,
+    notes: Object.fromEntries(noteKinds.map((k) => [k, handwriting[k]])),
+    parts,
+    time: handwriting["time-4-4"],
+    arcs,
+    beams,
+    letters: Object.fromEntries([...letterSet].map((c) => [c, letters[c]])),
+  }).replace(/</g, "\\u003c");
+}
+
+function StaffWritingData() {
+  return (
+    /* Raw on purpose: it is JSON, not markup, and staffWritingData escapes "<". */
+    <script
+      type="application/json"
+      id="staff-writing-data"
+      dangerouslySetInnerHTML={{ __html: staffWritingData() }}
+    />
   );
 }
 
@@ -577,6 +658,7 @@ function HomePage() {
                   </>
                 ))}
               </p>
+              <StaffWriting score="masthead" start="load" class="handwriting" delay={0.8} />
             </div>
           </section>
 
@@ -607,12 +689,13 @@ function HomePage() {
           </Band>
         </main>
 
-        <Footer>
+        <Footer score>
           <Link href={site.sourceRepo} where="footer">
             {labels.source}
           </Link>
         </Footer>
 
+        <StaffWritingData />
         <Scripts home />
       </body>
     </html>

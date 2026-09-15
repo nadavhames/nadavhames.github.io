@@ -6,3 +6,6 @@ Turmite Sim/Styles/watch.js
 
 Nadav-Hames-Resume.pdf
 bun.lock
+
+# Generated stroke data (scripts/extract-handwriting.ts).
+handwriting.ts

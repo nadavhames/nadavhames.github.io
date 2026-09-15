@@ -46,7 +46,7 @@ jobs:
           mkdir _site
           rsync -a \
             --exclude '.git' --exclude '.github' --exclude '.claude' \
-            --exclude 'node_modules' --exclude '_site' \
+            --exclude 'node_modules' --exclude '_site' --exclude 'scripts' \
             --exclude '*.ts' --exclude '*.tsx' --exclude 'tsconfig.json' \
             --exclude 'package.json' --exclude 'bun.lock' --exclude 'mise.toml' \
             --exclude '*.md' --exclude '.gitignore' \

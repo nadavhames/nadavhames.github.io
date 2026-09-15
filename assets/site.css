@@ -8,19 +8,19 @@
    file needs a theme selector of its own. */
 
 :root {
-  /* A soft dark slate rather than near-black. If you change this, update the
-     dark theme-color meta tag in build.tsx to match. */
-  --bg: #181b21;
-  --surface: #21252c;
-  --line: #343a45;
-  --line-soft: #272c34;
-  --text: #e7e9ee;
+  /* Ink and paper: near-neutral greys with one amber accent. If you change --bg, update the
+     theme-color meta tags in build.tsx to match. */
+  --bg: #16171a;
+  --surface: #1e1f23;
+  --line: #36383e;
+  --line-soft: #26272b;
+  --text: #ededeb;
   /* Paragraphs: a step below headings, so long text is easy on the eyes without going grey. */
-  --body: #b9bfc9;
-  --muted: #9aa3b1;
-  --faint: #8a92a0;
+  --body: #b4b4b1;
+  --muted: #9c9c98;
+  --faint: #8b8b87;
   --accent: #e8b96a;
-  --on-accent: #12141a;
+  --on-accent: #16171a;
   --danger: #ec8f7f;
   --scheme: dark; /* native controls such as <select> menus */
   /* Light text on dark reads heavier than dark on light; thinner rendering evens it out. */
@@ -38,7 +38,7 @@
   --echo-lit: 88%;
   --echo-glow: 9px;
   --selection: rgba(232, 185, 106, 0.25);
-  --shadow-pop: 0 16px 44px -20px rgba(0, 0, 0, 0.8), 0 2px 6px rgba(0, 0, 0, 0.35);
+  --shadow-pop: 0 12px 28px -18px rgba(0, 0, 0, 0.7);
 
   --serif: "Newsreader", Georgia, "Times New Roman", serif;
   --sans:
@@ -52,18 +52,24 @@
   --pad: clamp(1.25rem, 5vw, 3rem);
   /* Total width of the page column; the glyph strip fills what is left beside it. */
   --column: calc(var(--label) + var(--gutter) + var(--measure) + var(--pad) * 2);
+
+  /* Five 1px lines with 5px spacing, so the clef below can sit at its true proportions. */
+  --staff-height: 21px;
+  --staff: repeating-linear-gradient(to bottom, var(--line) 0 1px, transparent 1px 5px);
+  /* Treble clef outline from Noto Music (SIL Open Font License), embedded so no font is needed. */
+  --clef: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 611 1732'%3E%3Cpath d='M264 533Q250 480 241 428Q232 376 232 322Q232 275 238.5 233.5Q245 192 257 157Q270 117 291 81.5Q312 46 335.5 23Q359 0 377 0Q401 0 443 85Q464 128 474 178Q484 228 484 285Q484 356 465 426.5Q446 497 409.5 559Q373 621 322 668L357 836Q372 834 382 833Q392 832 397 832Q458 832 506 866.5Q554 901 582.5 957Q611 1013 611 1080Q611 1157 571.5 1218.5Q532 1280 453 1309Q458 1326 482 1451Q488 1481 491 1498.5Q494 1516 495 1529Q496 1542 496 1559Q496 1609 471.5 1648.5Q447 1688 405.5 1710Q364 1732 313 1732Q261 1732 221 1712.5Q181 1693 158 1658.5Q135 1624 135 1579Q135 1531 161.5 1499Q188 1467 237 1467Q279 1467 305.5 1497.5Q332 1528 332 1570Q332 1606 307 1633Q282 1660 242 1660H232Q258 1699 314 1699Q383 1699 422 1654Q461 1609 461 1539Q461 1522 457 1493.5Q453 1465 443 1425Q433 1385 427.5 1359Q422 1333 420 1322Q386 1332 340 1332Q254 1332 172 1282Q92 1232 46 1150Q0 1068 0 973Q0 883 41 804Q82 725 142.5 659Q203 593 264 533ZM291 508Q314 496 340 463.5Q366 431 390 389Q414 347 429 304.5Q444 262 444 228Q444 192 433 171Q422 150 395 150Q371 150 348.5 172Q326 194 308.5 230.5Q291 267 281 312Q271 357 271 404Q271 436 277.5 462Q284 488 291 508ZM348 955Q321 961 297 980.5Q273 1000 258.5 1027.5Q244 1055 244 1086Q244 1111 257 1137.5Q270 1164 289 1180Q302 1192 315 1198Q330 1205 330 1211Q330 1214 320 1217Q282 1208 251.5 1183Q221 1158 203.5 1122.5Q186 1087 186 1047Q186 1004 203.5 964Q221 924 252.5 892Q284 860 324 844L295 693Q179 787 124.5 877.5Q70 968 70 1057Q70 1122 104 1178Q138 1234 197 1268.5Q256 1303 330 1303Q350 1303 370.5 1299Q391 1295 414 1289ZM445 1279Q543 1237 543 1107Q543 1064 521 1028.5Q499 993 462 972Q425 951 379 951Z'/%3E%3C/svg%3E");
 }
 
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
-    --bg: #fbf9f6;
+    --bg: #fafaf8;
     --surface: #ffffff;
-    --line: #ded8cd;
-    --line-soft: #eae5dc;
-    --text: #1b1d21;
-    --body: #464a52;
-    --muted: #575e69;
-    --faint: #5f6672;
+    --line: #d6d6d1;
+    --line-soft: #e8e8e4;
+    --text: #141414;
+    --body: #454542;
+    --muted: #5d5d59;
+    --faint: #686864;
     --accent: #936616;
     --on-accent: #ffffff;
     --danger: #a63a29;
@@ -82,7 +88,7 @@
     --echo-lit: 28%;
     --echo-glow: 13px;
     --selection: rgba(154, 107, 23, 0.18);
-    --shadow-pop: 0 16px 44px -22px rgba(60, 48, 24, 0.42), 0 2px 6px rgba(60, 48, 24, 0.1);
+    --shadow-pop: 0 12px 28px -18px rgba(0, 0, 0, 0.22);
   }
 }
 
@@ -90,14 +96,14 @@
   --scheme: light;
   --smoothing: auto;
   --moz-smoothing: auto;
-  --bg: #fbf9f6;
+  --bg: #fafaf8;
   --surface: #ffffff;
-  --line: #ded8cd;
-  --line-soft: #eae5dc;
-  --text: #1b1d21;
-  --body: #464a52;
-  --muted: #575e69;
-  --faint: #5f6672;
+  --line: #d6d6d1;
+  --line-soft: #e8e8e4;
+  --text: #141414;
+  --body: #454542;
+  --muted: #5d5d59;
+  --faint: #686864;
   --accent: #936616;
   --on-accent: #ffffff;
   --danger: #a63a29;
@@ -113,7 +119,7 @@
   --echo-lit: 28%;
   --echo-glow: 13px;
   --selection: rgba(154, 107, 23, 0.18);
-  --shadow-pop: 0 16px 44px -22px rgba(60, 48, 24, 0.42), 0 2px 6px rgba(60, 48, 24, 0.1);
+  --shadow-pop: 0 12px 28px -18px rgba(0, 0, 0, 0.22);
 }
 
 * {
@@ -491,7 +497,91 @@ p {
 
 .masthead {
   position: relative;
-  padding: 3.5rem 0 2.25rem;
+  /* Room below the staff for the handwritten dynamics that hang under it. */
+  padding: 3.5rem 0 1.5rem;
+}
+
+/* The page opens on a staff, starting with a barline, and the footer closes on one. */
+.masthead > .shell {
+  position: relative;
+}
+/* Sized so a 5px staff space matches the font's, which puts the clef's curl round the second
+   line. It is a mask, so it takes the theme colour. */
+.masthead > .shell::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--pad) + 7px);
+  bottom: -7.5px;
+  width: 12.2px;
+  height: 34.6px;
+  background: var(--muted);
+  -webkit-mask: var(--clef) no-repeat center / contain;
+  mask: var(--clef) no-repeat center / contain;
+}
+.masthead > .shell::after {
+  content: "";
+  display: block;
+  height: var(--staff-height);
+  margin-top: 2.25rem;
+  background: linear-gradient(to right, var(--muted) 0 1px, transparent 1px), var(--staff);
+}
+.masthead + .band .band__grid {
+  border-top: 0;
+}
+
+/* Handwritten melody over the staff, clear of the clef. build.tsx places each symbol with a
+   nested <svg x="…%">, which is why the inner svgs must let their strokes overflow. */
+.handwriting {
+  position: absolute;
+  left: calc(var(--pad) + 30px);
+  bottom: 0;
+  /* An svg is a replaced element: it won't stretch between left and right, so size it outright. */
+  width: calc(100% - 2 * var(--pad) - 36px);
+  height: var(--staff-height);
+  overflow: visible;
+  pointer-events: none;
+}
+.ink svg {
+  overflow: visible;
+}
+/* pathLength="1" makes every stroke one unit long, so a dash offset of 1 hides it and 0 shows it
+   whole. It starts transparent too, or the round cap would leave a dot before the pen arrives. */
+.ink path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  animation:
+    pen-ink 0s linear var(--d) forwards,
+    pen-write var(--t) cubic-bezier(0.35, 0, 0.65, 1) var(--d) forwards;
+}
+@keyframes pen-ink {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes pen-write {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.ink .beam path {
+  stroke-width: 1.6;
+}
+.ink .ledger path,
+.ink .slur path,
+.ink .tie path {
+  stroke-width: 1;
+}
+/* Redrawn after a resize: show it written rather than writing it again. */
+.ink.is-done path {
+  animation: none;
+  opacity: 1;
+  stroke-dashoffset: 0;
 }
 
 .masthead__name {
@@ -590,7 +680,7 @@ p {
   font-family: var(--serif);
   font-size: var(--size);
   line-height: 1;
-  color: var(--accent);
+  color: var(--muted);
   opacity: var(--peak);
   will-change: transform;
   /* Placed from --y until the script takes over, so the first paint is right. */
@@ -617,14 +707,19 @@ p {
   border-top: 1px solid var(--line-soft);
 }
 
+/* Boxed like the rehearsal marks in a score. */
 .band__label {
+  justify-self: end;
+  align-self: start;
+  margin-top: 0.2rem;
+  padding: 0.2rem 0.4rem 0.15rem 0.5rem;
   font-family: var(--mono);
   font-size: 0.72rem;
-  letter-spacing: 0.14em;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--faint);
-  text-align: right;
-  padding-top: 0.25rem;
+  color: var(--text);
+  border: 1px solid var(--muted);
 }
 
 @media (max-width: 40rem) {
@@ -633,8 +728,8 @@ p {
     gap: 0.65rem;
   }
   .band__label {
-    text-align: left;
-    padding-top: 0;
+    justify-self: start;
+    margin-top: 0;
   }
 }
 
@@ -643,7 +738,7 @@ p {
 .entry + .entry {
   margin-top: 1.25rem;
   padding-top: 1.25rem;
-  border-top: 1px dotted var(--line-soft);
+  border-top: 1px solid var(--line-soft);
 }
 
 .entry__head {
@@ -707,7 +802,7 @@ p {
   align-items: baseline;
   gap: 0.15rem 0.9rem;
   padding: 0.8rem 0;
-  border-top: 1px dotted var(--line-soft);
+  border-top: 1px solid var(--line-soft);
 }
 .project:first-child {
   border-top: 0;
@@ -917,8 +1012,8 @@ p {
 }
 
 .footer__inner {
-  border-top: 1px solid var(--line-soft);
-  padding-top: 1rem;
+  position: relative;
+  padding-top: 0;
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -928,6 +1023,40 @@ p {
   font-size: 0.72rem;
   letter-spacing: 0.04em;
   color: var(--faint);
+}
+/* Final barline: a thin line, a gap, then a thick one, at the end of the staff. */
+.footer__inner::before {
+  content: "";
+  flex: 0 0 100%;
+  height: var(--staff-height);
+  margin-bottom: 0.75rem;
+  background:
+    linear-gradient(
+      to right,
+      transparent calc(100% - 7px),
+      var(--muted) calc(100% - 7px) calc(100% - 6px),
+      transparent calc(100% - 6px) calc(100% - 4px),
+      var(--text) calc(100% - 4px)
+    ),
+    var(--staff);
+}
+/* With a score written on it, the staff needs room above for the clef and markings and below
+   for slurs and dynamics. */
+.footer__inner:has(.staff-writing) {
+  --staff-top: 2rem;
+}
+.footer__inner:has(.staff-writing)::before {
+  margin-top: var(--staff-top);
+  margin-bottom: 2.5rem;
+}
+.staff-writing {
+  position: absolute;
+  top: var(--staff-top);
+  left: 0;
+  width: 100%;
+  height: var(--staff-height);
+  overflow: visible;
+  pointer-events: none;
 }
 .footer a {
   color: var(--faint);
@@ -1594,5 +1723,11 @@ a.button:hover {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+  /* The delays would still stagger the notes in, so show the melody already written. */
+  .ink path {
+    animation: none !important;
+    opacity: 1;
+    stroke-dashoffset: 0;
   }
 }

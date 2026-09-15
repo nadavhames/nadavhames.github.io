@@ -1013,7 +1013,8 @@ p {
 
 .footer__inner {
   position: relative;
-  padding-top: 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line-soft);
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -1024,12 +1025,20 @@ p {
   letter-spacing: 0.04em;
   color: var(--faint);
 }
-/* Final barline: a thin line, a gap, then a thick one, at the end of the staff. */
-.footer__inner::before {
+/* The home page's footer is a staff with a score written on it, ending in a final barline: a
+   thin line, a gap, then a thick one. Other pages keep a plain hairline. */
+.footer__inner--staff {
+  --staff-top: 2rem;
+  padding-top: 0;
+  border-top: 0;
+}
+.footer__inner--staff::before {
   content: "";
   flex: 0 0 100%;
   height: var(--staff-height);
-  margin-bottom: 0.75rem;
+  /* Room above for the clef and markings, below for slurs and dynamics. */
+  margin-top: var(--staff-top);
+  margin-bottom: 2.5rem;
   background:
     linear-gradient(
       to right,
@@ -1039,15 +1048,6 @@ p {
       var(--text) calc(100% - 4px)
     ),
     var(--staff);
-}
-/* With a score written on it, the staff needs room above for the clef and markings and below
-   for slurs and dynamics. */
-.footer__inner:has(.staff-writing) {
-  --staff-top: 2rem;
-}
-.footer__inner:has(.staff-writing)::before {
-  margin-top: var(--staff-top);
-  margin-bottom: 2.5rem;
 }
 .staff-writing {
   position: absolute;

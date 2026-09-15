@@ -301,7 +301,7 @@ function TopBar({ children }: { children: ComponentChildren }) {
 function Footer({ children, score }: { children: ComponentChildren; score?: boolean }) {
   return (
     <footer class="footer shell">
-      <div class="footer__inner">
+      <div class={score ? "footer__inner footer__inner--staff" : "footer__inner"}>
         {score && <StaffWriting score="footer" start="view" class="staff-writing" />}
         <span>
           &copy;

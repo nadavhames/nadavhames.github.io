@@ -302,9 +302,9 @@ measure, hairline rules, dates in a monospaced column, and:
 - **Palette** — near-neutral ink and paper with a single amber accent (the owner prefers amber;
   don't swap it). No glows, gradients or soft shadows; the only shadow is the crisp `--shadow-pop` on the
   résumé preview.
-- **Staff** — a five-line staff (`--staff`, drawn with gradients, 5px spacing) opens the page under
+- **Staff** — home page only. A five-line staff (`--staff`, drawn with gradients, 5px spacing) opens it under
   the masthead with a barline and treble clef, and the footer closes on one ending in a final
-  double barline. The clef is Noto Music's outline (OFL) embedded as an SVG mask in `--clef`, so
+  double barline (`footer__inner--staff`, set by `Footer score`). Other pages keep a plain hairline. The clef is Noto Music's outline (OFL) embedded as an SVG mask in `--clef`, so
   it takes the theme colour and needs no font; its size and offset are tied to the 5px spacing,
   so change them together.
 - **Rehearsal marks** — section labels are boxed mono caps hanging in the left margin.

@@ -53,11 +53,25 @@
   /* Total width of the page column; the glyph strip fills what is left beside it. */
   --column: calc(var(--label) + var(--gutter) + var(--measure) + var(--pad) * 2);
 
-  /* Five 1px lines with 5px spacing, so the clef below can sit at its true proportions. */
-  --staff-height: 21px;
-  --staff: repeating-linear-gradient(to bottom, var(--line) 0 1px, transparent 1px 5px);
+  /* Five 1px lines a space apart; the clef and the handwriting are sized from the space too. Phones
+     engrave it smaller so both staffs keep all four bars (staff-writing.js reads it back from the
+     staff's height). */
+  --space: 5px;
+  --staff-height: calc(var(--space) * 4 + 1px);
+  --staff: repeating-linear-gradient(to bottom, var(--line) 0 1px, transparent 1px var(--space));
   /* Treble clef outline from Noto Music (SIL Open Font License), embedded so no font is needed. */
   --clef: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 611 1732'%3E%3Cpath d='M264 533Q250 480 241 428Q232 376 232 322Q232 275 238.5 233.5Q245 192 257 157Q270 117 291 81.5Q312 46 335.5 23Q359 0 377 0Q401 0 443 85Q464 128 474 178Q484 228 484 285Q484 356 465 426.5Q446 497 409.5 559Q373 621 322 668L357 836Q372 834 382 833Q392 832 397 832Q458 832 506 866.5Q554 901 582.5 957Q611 1013 611 1080Q611 1157 571.5 1218.5Q532 1280 453 1309Q458 1326 482 1451Q488 1481 491 1498.5Q494 1516 495 1529Q496 1542 496 1559Q496 1609 471.5 1648.5Q447 1688 405.5 1710Q364 1732 313 1732Q261 1732 221 1712.5Q181 1693 158 1658.5Q135 1624 135 1579Q135 1531 161.5 1499Q188 1467 237 1467Q279 1467 305.5 1497.5Q332 1528 332 1570Q332 1606 307 1633Q282 1660 242 1660H232Q258 1699 314 1699Q383 1699 422 1654Q461 1609 461 1539Q461 1522 457 1493.5Q453 1465 443 1425Q433 1385 427.5 1359Q422 1333 420 1322Q386 1332 340 1332Q254 1332 172 1282Q92 1232 46 1150Q0 1068 0 973Q0 883 41 804Q82 725 142.5 659Q203 593 264 533ZM291 508Q314 496 340 463.5Q366 431 390 389Q414 347 429 304.5Q444 262 444 228Q444 192 433 171Q422 150 395 150Q371 150 348.5 172Q326 194 308.5 230.5Q291 267 281 312Q271 357 271 404Q271 436 277.5 462Q284 488 291 508ZM348 955Q321 961 297 980.5Q273 1000 258.5 1027.5Q244 1055 244 1086Q244 1111 257 1137.5Q270 1164 289 1180Q302 1192 315 1198Q330 1205 330 1211Q330 1214 320 1217Q282 1208 251.5 1183Q221 1158 203.5 1122.5Q186 1087 186 1047Q186 1004 203.5 964Q221 924 252.5 892Q284 860 324 844L295 693Q179 787 124.5 877.5Q70 968 70 1057Q70 1122 104 1178Q138 1234 197 1268.5Q256 1303 330 1303Q350 1303 370.5 1299Q391 1295 414 1289ZM445 1279Q543 1237 543 1107Q543 1064 521 1028.5Q499 993 462 972Q425 951 379 951Z'/%3E%3C/svg%3E");
+}
+
+@media (max-width: 440px) {
+  :root {
+    --space: 4px;
+  }
+}
+@media (max-width: 350px) {
+  :root {
+    --space: 3.5px;
+  }
 }
 
 @media (prefers-color-scheme: light) {
@@ -505,15 +519,15 @@ p {
 .masthead > .shell {
   position: relative;
 }
-/* Sized so a 5px staff space matches the font's, which puts the clef's curl round the second
-   line. It is a mask, so it takes the theme colour. */
+/* Sized so a staff space matches the font's, which puts the clef's curl round the second line.
+   It is a mask, so it takes the theme colour. */
 .masthead > .shell::before {
   content: "";
   position: absolute;
-  left: calc(var(--pad) + 7px);
-  bottom: -7.5px;
-  width: 12.2px;
-  height: 34.6px;
+  left: calc(var(--pad) + var(--space) * 1.4);
+  bottom: calc(var(--space) * -1.5);
+  width: calc(var(--space) * 2.44);
+  height: calc(var(--space) * 6.92);
   background: var(--muted);
   -webkit-mask: var(--clef) no-repeat center / contain;
   mask: var(--clef) no-repeat center / contain;
@@ -533,10 +547,10 @@ p {
    nested <svg x="…%">, which is why the inner svgs must let their strokes overflow. */
 .handwriting {
   position: absolute;
-  left: calc(var(--pad) + 30px);
+  left: calc(var(--pad) + var(--space) * 6);
   bottom: 0;
   /* An svg is a replaced element: it won't stretch between left and right, so size it outright. */
-  width: calc(100% - 2 * var(--pad) - 36px);
+  width: calc(100% - 2 * var(--pad) - var(--space) * 7.2);
   height: var(--staff-height);
   overflow: visible;
   pointer-events: none;
@@ -576,6 +590,115 @@ p {
 .ink .slur path,
 .ink .tie path {
   stroke-width: 1;
+}
+/* Marks ease to their new places on resize, and the sounding note rises. */
+.ink g {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+.ink path {
+  transition: stroke 0.35s ease;
+}
+
+/* A staff plays its tune when clicked: an invisible band around it takes the click. */
+.staff-hit {
+  fill: transparent;
+  pointer-events: all;
+  cursor: pointer;
+}
+/* A click flashes the ring and lets it fade; keyboard focus keeps it, so tabbing shows where you are. */
+.ink[role="button"]:focus {
+  outline: none;
+}
+.ink.is-keyboard-focus {
+  outline: 1.5px solid var(--text);
+  outline-offset: 12px;
+}
+.ink.is-ringing {
+  outline: 1.5px solid transparent;
+  outline-offset: 12px;
+  animation: ring-fade 1.4s ease-out;
+}
+@keyframes ring-fade {
+  0%,
+  40% {
+    outline-color: var(--text);
+  }
+  100% {
+    outline-color: transparent;
+  }
+}
+
+/* One dot per tune before the masthead staff, the current one filled; a press moves to the next.
+   Deliberately faint: something to find, not a control that competes with the page. */
+.staff-controls {
+  position: absolute;
+  left: calc(var(--pad) - 3px);
+  bottom: calc(var(--staff-height) + 12px);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.tune-switch,
+.chords-switch {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.tune-switch span,
+.chords-switch span {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--line);
+  transition: background-color 0.25s ease;
+}
+.tune-switch span.is-current {
+  background: var(--muted);
+}
+.tune-switch:hover span.is-current,
+.tune-switch:focus-visible span.is-current {
+  background: var(--accent);
+}
+/* The backing toggle: a small stack of dots, filled while chords are on. */
+.chords-switch {
+  flex-direction: column;
+  gap: 1px;
+}
+.chords-switch span {
+  width: 2px;
+  height: 2px;
+}
+.chords-switch[aria-pressed="true"] span {
+  background: var(--muted);
+}
+.chords-switch:hover span,
+.chords-switch:focus-visible span {
+  background: var(--accent);
+}
+.tune-switch:focus-visible,
+.chords-switch:focus-visible {
+  outline: 1.5px solid var(--accent);
+  outline-offset: 2px;
+}
+/* While it plays, the rest of the music steps back and the sounding note rises in full ink. */
+.ink.is-performing g {
+  opacity: 0.4;
+}
+.ink.is-performing g.is-sounding {
+  opacity: 1;
+  transform: translateY(-1.5px) scale(1.14);
+  transition-duration: 0.08s;
+}
+.ink g.is-sounding path {
+  stroke: var(--text);
+  transition-duration: 0.08s;
 }
 /* Redrawn after a resize: show it written rather than writing it again. */
 .ink.is-done path {
@@ -1725,6 +1848,9 @@ a.button:hover {
     transition-duration: 0.001ms !important;
   }
   /* The delays would still stagger the notes in, so show the melody already written. */
+  .ink g.is-sounding {
+    transform: none !important;
+  }
   .ink path {
     animation: none !important;
     opacity: 1;

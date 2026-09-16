@@ -234,6 +234,10 @@ const parts = {
   flat: fit([73, 74, 75, 76], 2.4 * SPACE, 0.5, 0.75),
   "rest-quarter": fit([101, 102, 103, 104], 2.8 * SPACE, 0.5, 0.5),
   "rest-eighth": fit([65, 66, 67, 68], 1.8 * SPACE, 0.5, 0.5),
+  // A half rest: the musician's whole/half rest is a short bar, sitting on the middle line.
+  "rest-half": fit([145, 146, 147, 148], 1.2 * SPACE, 0.5, 1, "w"),
+  // An augmentation dot, scribbled small, anchored at its centre.
+  dot: fit([49, 50, 51, 52], 1.6, 0.5, 0.5),
   barline: handwriting.barline!,
 };
 const arcs = [150, 151, 152].map(arc);
@@ -281,7 +285,7 @@ function baseline(c: string, b: ReturnType<typeof bounds>) {
 }
 
 const letters: Record<string, Letter[]> = {};
-for (const c of "abcdefghijklmnopqrstuvwxyz.") {
+for (const c of "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.") {
   letters[c] = (raw[c] ?? []).map((strokes) => {
     const b = bounds(strokes.flat());
     return {

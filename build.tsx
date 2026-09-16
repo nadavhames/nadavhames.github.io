@@ -24,10 +24,10 @@ import {
   notFound,
   marginalia,
   games,
-  mastheadScore,
-  footerScore,
+  tunes,
 } from "./content";
 import { handwriting, parts, arcs, beams, letters } from "./handwriting";
+import { scoresFor } from "./score";
 
 /* ---------- prose -------------------------------------------------------- */
 
@@ -396,7 +396,7 @@ function StaffWriting({
   class: className,
   delay,
 }: {
-  score: keyof typeof scores;
+  score: "masthead" | "footer";
   start: "load" | "view";
   class: string;
   delay?: number;
@@ -408,13 +408,57 @@ function StaffWriting({
       data-staff-writing={score}
       data-start={start}
       data-delay={delay}
+      data-play-label={labels.playExcerpt}
+      data-stop-label={labels.stopExcerpt}
     >
       <desc>{collapse(HANDWRITING_CREDIT)}</desc>
     </svg>
   );
 }
 
-const scores = { masthead: mastheadScore, footer: footerScore };
+/** Every tune, as the two scores the staffs write. The first is shown until a visitor switches. */
+const scoredTunes = tunes.map((tune) => ({
+  name: tune.name,
+  feel: tune.feel ?? "polka",
+  ...scoresFor(tune),
+}));
+
+/**
+ * The small dots before the masthead staff: one per tune, the current one filled. A button, not a
+ * menu — each press moves to the next tune (assets/staff-writing.js).
+ */
+function TuneSwitch() {
+  const first = tunes[0]!.name;
+  return (
+    <div class="staff-controls">
+      <button
+        class="tune-switch"
+        type="button"
+        data-tune-switch=""
+        data-label={labels.nextTune}
+        aria-label={labels.nextTune.replace("{tune}", first)}
+        title={first}
+      >
+        {tunes.map((_, i) => (
+          <span class={i === 0 ? "is-current" : undefined} />
+        ))}
+      </button>
+      {/* Three stacked dots, like a chord; filled while the guitar backing is on. */}
+      <button
+        class="chords-switch"
+        type="button"
+        data-chords-switch=""
+        aria-pressed="true"
+        aria-label={labels.backingChords}
+        title={labels.backingChords}
+      >
+        <span />
+        <span />
+        <span />
+      </button>
+    </div>
+  );
+}
 
 /**
  * Everything assets/staff-writing.js needs: the scores and the strokes they draw from. JSON can't
@@ -422,9 +466,11 @@ const scores = { masthead: mastheadScore, footer: footerScore };
  * from closing the tag.
  */
 function staffWritingData(): string {
-  const all = Object.values(scores).flat();
+  const all = scoredTunes.flatMap((t) => [...t.masthead, ...t.footer]);
   const letterSet = new Set(
-    all.flatMap((e) => ("text" in e ? [...e.text] : [])).filter((c) => letters[c]),
+    all
+      .flatMap((e) => ("text" in e ? [...e.text] : "chord" in e ? [...e.chord] : []))
+      .filter((c) => letters[c]),
   );
   const noteKinds = [
     "quarter-up",
@@ -435,7 +481,7 @@ function staffWritingData(): string {
     "eighth-down",
   ] as const;
   return JSON.stringify({
-    scores,
+    tunes: scoredTunes,
     notes: Object.fromEntries(noteKinds.map((k) => [k, handwriting[k]])),
     parts,
     time: handwriting["time-4-4"],
@@ -659,6 +705,7 @@ function HomePage() {
                 ))}
               </p>
               <StaffWriting score="masthead" start="load" class="handwriting" delay={0.8} />
+              <TuneSwitch />
             </div>
           </section>
 

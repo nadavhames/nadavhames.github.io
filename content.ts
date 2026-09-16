@@ -12,6 +12,8 @@
  *     *emphasis*                     italic, in the display serif
  */
 
+import type { Tune } from "./score";
+
 export const site = {
   url: "https://nadavhames.com/",
   title: "Nadav Hames — Software Developer",
@@ -61,87 +63,70 @@ export const marginalia = {
 };
 
 /**
- * Scores handwritten onto the two staffs, both in 4/4. Pitch counts staff steps up from the
- * bottom line: 0 is E, 2 is G on the second line, 4 is B on the middle line, 8 is F on the top
- * line; below 0 or above 8 gets ledger lines. Stems point down from the middle line up, as in
- * print; beamed groups and chords take the direction of their average.
+ * The tunes handwritten onto the two staffs, as ABC notation from thesession.org: eight bars
+ * (usually the first eight), bars 1–4 written under the masthead and 5–8 in the footer. The small dots before
+ * the masthead staff step through them, and a visitor's choice is remembered.
+ *
+ * All are traditional tunes in 2/4 (public domain): three Irish polkas and a Scottish pipe march.
+ * They share one form, written in 4/4 with every length doubled. score.ts turns them into scores
+ * and stops the build on anything it can't write. Allowed: notes A–G/a–g with ' and , for
+ * octaves, lengths like 2, /, /2, rests z, accidentals ^ _ =, broken rhythms like D>E (a dotted
+ * note and a short one), and spaces to break beams. Each bar must come to 2/4. No triplets, grace
+ * notes, ties or chords, and every tune must end its eighth bar on a cadence, since the footer
+ * closes on a final barline.
+ *
+ * `chords` are guitar chords for the same bars, written above the staffs where they change and
+ * strummed as backing when it's switched on. Only use chords published with a matching setting.
  */
-export type ScoreEvent =
-  | {
-      note: "whole" | "half" | "quarter" | "eighth";
-      /** One pitch, or several for a chord. */
-      pitch: number | number[];
-      accidental?: "sharp" | "flat" | "natural";
-      /** Joins eighth notes: "start" on the first, "end" on the last. */
-      beam?: "start" | "end";
-      /** A slur from a "start" note to its "end" note. */
-      slur?: "start" | "end";
-      /** Tie this note to the next one. */
-      tie?: true;
-    }
-  | { rest: "quarter" | "eighth" }
-  | { bar: true }
-  /** A handwritten treble clef, for a staff without a printed one. */
-  | { clef: "treble" }
-  | { time: "4/4" }
-  /** Handwritten performance text, written at the next note. Letters a–z and "." only. */
-  | { text: string; place: "above" | "below" };
-
-/**
- * Written under the masthead as the page loads, after the printed clef: an opening in 4/4 with
- * stems-down beams, a slur above, flat, natural, eighth rest and a tie within the bar.
- */
-export const mastheadScore: ScoreEvent[] = [
-  { time: "4/4" },
-  { text: "mf", place: "below" },
-  { note: "quarter", pitch: 7 },
-  { note: "eighth", pitch: 6, beam: "start" },
-  { note: "eighth", pitch: 5, beam: "end" },
-  { note: "quarter", pitch: 4, accidental: "flat" },
-  { rest: "eighth" },
-  { note: "eighth", pitch: 3 },
-  { bar: true },
-  { note: "quarter", pitch: [2, 4, 6] },
-  // Under the beamed run, whose stems stay inside the staff, not the chord's long stem.
-  { text: "cresc.", place: "below" },
-  { note: "eighth", pitch: 8, beam: "start", slur: "start" },
-  { note: "eighth", pitch: 7 },
-  { note: "eighth", pitch: 6 },
-  { note: "eighth", pitch: 5, beam: "end", slur: "end" },
-  { note: "quarter", pitch: 4, accidental: "natural" },
-  { bar: true },
-  { note: "half", pitch: 3, tie: true },
-  { note: "quarter", pitch: 3 },
-  { note: "quarter", pitch: 5 },
-  { bar: true },
-];
-
-/**
- * Written onto the footer staff once it scrolls into view. It closes on the footer's final
- * barline, so it is written as an ending: rising stems-up beams under a slur, a sharp, a tie
- * across the barline, chords, and a final chord.
- */
-export const footerScore: ScoreEvent[] = [
-  { clef: "treble" },
-  { text: "p", place: "below" },
-  { note: "eighth", pitch: 2, beam: "start", slur: "start" },
-  { note: "eighth", pitch: 3 },
-  { note: "eighth", pitch: 4 },
-  { note: "eighth", pitch: 5, beam: "end", slur: "end" },
-  { note: "quarter", pitch: 6 },
-  { rest: "quarter" },
-  { bar: true },
-  { note: "quarter", pitch: 1, accidental: "sharp" },
-  { note: "quarter", pitch: 2 },
-  { note: "half", pitch: 5, tie: true },
-  { bar: true },
-  { note: "quarter", pitch: 5 },
-  { note: "eighth", pitch: 4, beam: "start" },
-  { note: "eighth", pitch: 3, beam: "end" },
-  { note: "half", pitch: [0, 2, 4] },
-  { bar: true },
-  { text: "rit.", place: "above" },
-  { note: "whole", pitch: [-2, 0, 2] },
+export const tunes: Tune[] = [
+  {
+    name: "The Rakes of Mallow",
+    source: "https://thesession.org/tunes/85",
+    key: "G",
+    abc: `GB GB | GB c/B/A/G/ | FA FA | FA B/A/G/F/ | GB GB | GB d2 | c/B/A/G/ F/G/A/c/ | BG G2`,
+    chords: `G | | D | | G | | Am D | G`,
+    chordSource: `thesession.org/tunes/85, setting 47155, whose melody matches this one note for note`,
+  },
+  {
+    name: "John Ryan's Polka",
+    source: "https://thesession.org/tunes/441",
+    key: "D",
+    abc: `dd B/c/d/B/ | AF ED | dd B/c/d/B/ | AF E2 | dd B/c/d/B/ | AF Ad | fd ec | d2 d2`,
+    chords: `D G | D | D G | D A | D G | D | D A | D`,
+    chordSource: `thesession.org/tunes/441, settings 28845 and 56765, which agree`,
+  },
+  {
+    name: "The Ballydesmond Polka",
+    source: "https://thesession.org/tunes/531",
+    key: "D",
+    abc: `D2 FA | dc BA | BE EF | GA/G/ FE | D2 FA | dc BA | Be Bc | d2 d2`,
+    chords: `D | | Em | A7 | D | Bm | Em A7 | D`,
+    chordSource: `thesession.org/tunes/531, setting 27994 in G, transposed down a fourth to D: its melody is this one, a fourth higher`,
+  },
+  {
+    // A Scottish pipe march rather than an Irish polka, but traditional and in 2/4 all the same.
+    // These are bars 9–16, the first strain's answering phrase, which closes on the tonic
+    // (bars 1–8 stop on a half cadence).
+    name: "Scotland the Brave",
+    source: "https://thesession.org/tunes/4960",
+    key: "D",
+    abc: `D2 D>E | FD FA | d2 d>d | dA FD | G2 B>G | FA FD | E2 D>C | D4`,
+    chords: `D | | D G | D D7 | G | D Bm | E7 A7 | D`,
+    chordSource: `thesession.org/tunes/4960, setting 53645 in C, melody and chords both transposed up a tone to D`,
+  },
+  {
+    // Hoagy Carmichael and Stuart Gorrell, 1930: public domain in the US since 2026, a ballad in
+    // 4/4 rather than a tune from The Session. A simplified lead sheet, one ABC unit a quarter.
+    // These are bars 25–32, the last A section, which closes on the tonic.
+    name: "Georgia on My Mind",
+    source:
+      "https://abcnotation.com/tunePage?a=github.com/ian-hayden/abc-music-files/abc-music-files-main.zip/abc-music-files-main/Jazz%20songs/Georgia%20on%20my%20Mind.no-ext/0000",
+    key: "F",
+    feel: "ballad",
+    abc: `A c3 | A G3 | z A d A | F3 F/G/ | A c e d | B D A A | F4- | F2 z2`,
+    chords: `Fma7 | Em7 A7@2 | Dm7 Dm7/C@4 | Bm7 | Am7 D7@3 | Gm7 C7@3 | Fma7 | `,
+    chordSource: `the same lead sheet (Ian Hayden's collection on abcnotation.com), bars 25–32 as written, except the last bar's Gm7–C7, a turnaround back to the top, which is left out so the excerpt ends on F`,
+  },
 ];
 
 export const work = [
@@ -284,6 +269,13 @@ export const labels = {
   themeToggle: "Switch colour theme",
   resume: "Resume",
   source: "Source",
+  /** Read aloud for the handwritten staffs, which play their tune when clicked. {tune} is its name. */
+  playExcerpt: "Play {tune}",
+  stopExcerpt: "Stop playing",
+  /** The dots before the masthead staff that switch tunes. */
+  nextTune: "Switch tune, now {tune}",
+  /** The small button beside those dots that turns the guitar backing on and off. */
+  backingChords: "Backing chords",
 };
 
 export const contact = {

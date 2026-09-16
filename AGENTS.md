@@ -41,6 +41,7 @@ assets/contact.js          sends the contact form inline
 assets/echo.js             the 404 page's easter egg
 assets/staff-writing.js    lays out and writes both staffs' scores
 handwriting.ts             GENERATED pen strokes for the staffs (see Handwritten staffs)
+score.ts                   turns the tunes' ABC notation into the staffs' scores
 scripts/                   one-off generators, never deployed
 Nadav-Hames-Resume.pdf     the résumé
 dev.ts                     local dev server with live reload (never deployed)
@@ -206,6 +207,9 @@ Custom events:
 | `echo-game-over` | a game ends on a wrong note                 | `score`, `best` (that browser's), `newBest`, `seconds`                  |
 | `echo-new-best`  | a game beats that browser's best            | `best`                                                                  |
 | `echo-quit`      | the game is closed mid-round                | `round`                                                                 |
+| `staff-play`     | a handwritten staff is clicked to play/stop | `tune`                                                                  |
+| `tune-switch`    | the tune dots are pressed                   | `tune`: the tune switched to                                            |
+| `chords-toggle`  | the backing-chords button is pressed        | `on`                                                                    |
 
 - Links get their event automatically from their href in `Link` in `build.tsx`, so new links in
   `content.ts` are tracked with no extra work.
@@ -233,22 +237,90 @@ Musical symbols fill the space beside the page column and move with parallax on 
 ## Handwritten staffs
 
 Both staffs on the home page have music written onto them in amber ink, stroke by stroke, as if
-with a pen: the masthead's as the page loads (about 23 seconds, after the printed clef), the
-footer's once it scrolls into view (about 20 seconds, closing on the final barline). Both are in
-4/4 and deliberately different:
+with a pen: the masthead's as the page loads (about 24 seconds, after the printed clef), the
+footer's once it scrolls into view (about 21 seconds, closing on the final barline).
 
-- **Masthead** (`mastheadScore`): an opening — handwritten 4/4, _mf_, stems-down beams, a flat, an
-  eighth rest, a chord, _cresc._ under a four-note run slurred from above, a natural, a tie within
-  the bar, and a closing barline.
-- **Footer** (`footerScore`): an ending — handwritten clef, _p_, rising stems-up beams slurred from
-  below, a sharp, a tie across the barline, an open chord, _rit._, and a whole-note chord with a
-  ledger line.
+**Tunes.** The music is eight bars of a public-domain tune, bars 1–4 on the masthead carrying
+straight on to 5–8 in the footer, which close on a cadence at the final barline. The tunes are
+`tunes` in `content.ts`, as ABC notation:
 
-Keep them distinct if you edit either. Scores are typed `ScoreEvent`s in `content.ts`: notes with a
-pitch or a chord, accidental, beam and slur start/end, tie; rests; bars; clef; time; text above or
-below. Pitch counts staff steps up from the bottom line (0 E, 2 G, 4 B, 8 F); stems point down from
-the middle line up, and beamed groups and chords follow their average. Check each bar adds to 4
-beats. Attach text to a note whose stem stays inside the staff, or it collides.
+- Three Irish polkas from thesession.org (The Rakes of Mallow, John Ryan's Polka, The Ballydesmond
+  Polka), using their first eight bars.
+- The Scottish pipe march Scotland the Brave, also from The Session. It uses bars 9–16, since its
+  first eight stop on a half cadence.
+- Georgia on My Mind (Carmichael and Gorrell, 1930), from a simplified lead sheet on
+  abcnotation.com. It is public domain in the US since 2026 but not everywhere: in life-plus-70
+  countries it stays in copyright until 2052. It uses bars 25–32, the last A section, and plays as a
+  ballad (`feel: "ballad"`).
+
+- **Switching.** Faint dots just above the start of the masthead staff (`TuneSwitch`, one per tune,
+  the current one lit) are a button, not a menu: each press moves to the next tune, stops any
+  playback, and rewrites both staffs at 2.5× pen speed. The choice is saved in `localStorage`
+  (`staff-tune`, by name) and restored on the next visit.
+- **`score.ts`** turns each tune's ABC into the two staffs' `ScoreEvent`s, and stops the build on
+  anything the handwriting can't draw (triplets, grace notes, chords of notes, dotted rests, whole
+  rests) or a bar that isn't four units. One ABC unit is written as a quarter: 2/4 tunes with L:1/8
+  come out in 4/4 with every length doubled, and 4/4 tunes with L:1/4 as they are. Ties (`F4-`) are
+  drawn and held in playback, not struck again. Broken rhythms
+  (`D>E`) become a dotted quarter and a lone flagged eighth; a dot sits right of the head, in the
+  space above when the head is on a line, and dotted notes get a little extra room. It adds the expression:
+  key signature and 4/4 on the masthead, clef and key on the footer, _mf_ at the start, a slur on
+  each staff's first run of four beamed eighths, and _rit._ over the last bar. To add a tune, paste
+  eight bars from The Session and check they end on a cadence. _mf_ and other text below the staff
+  drops just clear of low notes (`clearBelow`).
+- **Scores** are typed `ScoreEvent`s: notes with a pitch or chord, accidental, beam and slur
+  start/end, tie; rests; bars; clef; key (C, G, D, A, or F with its flat); time; text above or below. Pitch
+  counts staff steps up from the bottom line (0 E, 2 G, 4 B, 8 F, 9 G above the staff); stems point
+  down from the middle line up; beamed groups and chords follow their average.
+- **Phones show all four bars** on both staffs. Two things make room. The staff is engraved
+  smaller: `--space` in `site.css` is 5px, 4px under 440px and 3.5px under 350px. The staff lines,
+  clef and handwriting offsets are all sized from it, and `widthOf` in `staff-writing.js` reads the
+  scale back from the staff's height and sets the svg's `viewBox`, so strokes are always laid out in
+  5px-space units and a narrow staff lays out as a wider one. Spacing is by duration, but once an
+  eighth would get less than `MIN_EIGHTH` (11 units) every note, barline and accidental also takes
+  an equal share of the room (`SHARE`), trending toward even spacing. Dotted notes and lone flagged
+  eighths add a few fixed units (`ROOM`), so a dot or flag never runs into the next mark. At 320px
+  the tightest gap between marks is under 1px, with nothing touching; check that again after
+  adding a busy tune.
+
+**Chords.** Each tune has chords (`chords` in `content.ts`, the source in `chordSource`): one per
+bar, two for its halves, or any number on given beats with `@` (`Em7 A7@2`). Symbols can be a root
+with an optional flat, then nothing, `m`, `7`, `m7`, `ma7` or `6`, and an optional `/bass`. The
+letters dataset has no "/", so it is drawn with a slanted barline stroke. Only published chords are
+used, checked against the melody: The Rakes of Mallow from setting 47155; John Ryan's from settings 28845 and
+56765, which agree (46677's G under bar 2 clashes with the melody, so it isn't used); The
+Ballydesmond from setting 27994, which is the same melody in G, transposed down to D; Scotland the
+Brave from setting 53645 in C, melody and chords both transposed up a tone to D; Georgia on My
+Mind from the same lead sheet as its melody, leaving out the last bar's Gm7–C7 turnaround so it
+ends on F. `score.ts` places each chord at the note (or rest) starting on its beat and writes a symbol only where the
+chord changes, just above the staff (30% larger than other text). `clearChords` lifts a symbol
+only as far as a high stem, beam or slur under it needs (3px clearance). Tempo text such as _rit._
+also belongs above the staff, so where it shares a note with a chord it stacks above the symbol
+(`above-chord`) and lifts with it. On a squeezed staff, chords a beat apart can meet, so
+`spaceChords` nudges the later symbol right to keep a 4-unit gap. Capitals and digits come from the same UJI writer
+(`scripts/extract-handwriting.ts` extracts a–z, A–Z, 0–9 and "."). A tiny stack of dots after the
+tune dots (`data-chords-switch`) turns the backing on and off, live during playback, saved as
+`staff-chords` (on by default). The backing is on the same synthesised piano, quieter than the
+tune, and follows the tune's feel (`FEELS`). A polka gets an oom-pah: each beat is either a bass
+note (root, or the fifth on the off half of the bar, root again wherever the chord changes) or a
+short chord. A ballad gets held chords, bass and chord together, struck on beats 1 and 3 and
+wherever the chord changes. Both are timed off the melody, so they slow under _rit._, and the last
+chord rings. Voicings put the bass in E2–D♯3 (or the slash note) and the chord tones in E3–D♯4
+(`voicing`). Four-note chords leave the root to the bass, so sevenths don't cluster. While the backing is on, the sounding chord's symbol lights up with the note.
+
+**Playback.** Clicking a staff (or Enter/Space when focused) plays the whole excerpt, masthead then
+footer; clicking either again stops it. Pressed before the pen is done, both staffs finish writing
+at 45× speed (`hurry`, about half a second, drawing the footer on the spot if it hasn't scrolled
+into view) and then play. The click flashes a ring that fades within a second and a half; keyboard
+focus keeps a steady ring instead. While playing, the rest of the music dims and each note rises in
+full ink as it sounds (no lift with reduced motion). When the music reaches the footer and it isn't
+fully on screen, the page scrolls to the bottom (`follow`; smooth unless reduced motion). It waits until the
+masthead's last note has finished, so that note is seen playing. No recording exists for these settings, so
+the piano is synthesised with Web Audio in `assets/staff-writing.js`: a filtered-noise hammer over
+slightly stretched overtones that fade faster the higher they are. Pitches come from the score (key
+signature and accidentals included); `FEELS` sets each feel's tempo (0.3 s a quarter for polkas, 0.8 s for the ballad) and `RIT` how far the notes after
+_rit._ ease out. Only a note's own marks light up (head, stem, accidental, ledger). Labels are
+`labels.playExcerpt` / `labels.stopExcerpt` / `labels.nextTune`, with `{tune}` filled in.
 
 - **The strokes are real handwriting.** Music comes from HOMUS (Handwritten Online Musical Symbols;
   Calvo-Zaragoza & Oncina, ICPR 2014; revised copy at github.com/apacha/Homus), which recorded
@@ -257,6 +329,9 @@ beats. Attach text to a note whose stem stays inside the staff, or it collides.
   (Llorens et al., LREC 2008; UCI repository, **CC BY 4.0 — attribution required**), letters by
   writer W14; only a–z and "." exist. Both are credited in `handwriting.ts`, each staff's `<desc>`,
   and here.
+- **Augmentation dots** are musician 4's own HOMUS dots (samples 49–52), scaled to 1.6px (`parts.dot`).
+- **Half rests** are the same musician's whole/half rest bar (samples 145–148, `parts["rest-half"]`),
+  drawn in two close passes on the middle line. Flats in a key signature reuse `parts.flat`.
 - **HOMUS has no slurs, ties, beams, chords or text**, so they're assembled from musician 4's
   strokes: chords and beamed notes from separately drawn heads and stems (`parts`), stems stretched
   to meet the beam (stems-down ones are the same strokes turned round); slurs and ties from the
@@ -269,7 +344,7 @@ beats. Attach text to a note whose stem stays inside the staff, or it collides.
 - **Laid out in the browser** by `assets/staff-writing.js`, because slurs, ties and beams join notes
   whose pixel positions depend on each staff's width. Each staff is `StaffWriting` in `build.tsx`
   (`data-staff-writing` names its score, `data-start` is `load` or `view`); the scores and only the
-  strokes they use are inlined once as JSON (`StaffWritingData`). Clef and time signature take fixed
+  strokes they use are inlined once as JSON (`StaffWritingData`). Clef, key and time signature take fixed
   room so narrow screens squeeze the notes instead. When the staff changes width (a ResizeObserver, so scrollbars and
   reflows count too) every stroke is re-laid and eases to its new shape each frame; paths are
   reshaped in place, so writing in progress carries on. Layout must never add or drop a stroke, only
@@ -302,11 +377,11 @@ measure, hairline rules, dates in a monospaced column, and:
 - **Palette** — near-neutral ink and paper with a single amber accent (the owner prefers amber;
   don't swap it). No glows, gradients or soft shadows; the only shadow is the crisp `--shadow-pop` on the
   résumé preview.
-- **Staff** — home page only. A five-line staff (`--staff`, drawn with gradients, 5px spacing) opens it under
+- **Staff** — home page only. A five-line staff (`--staff`, drawn with gradients, `--space` apart: 5px, smaller on phones) opens it under
   the masthead with a barline and treble clef, and the footer closes on one ending in a final
   double barline (`footer__inner--staff`, set by `Footer score`). Other pages keep a plain hairline. The clef is Noto Music's outline (OFL) embedded as an SVG mask in `--clef`, so
-  it takes the theme colour and needs no font; its size and offset are tied to the 5px spacing,
-  so change them together.
+  it takes the theme colour and needs no font; its size and offset are multiples of `--space`,
+  so they scale with it.
 - **Rehearsal marks** — section labels are boxed mono caps hanging in the left margin.
 - **Margin symbols** print in `--muted` ink, not the accent.
 

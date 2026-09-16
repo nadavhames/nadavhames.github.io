@@ -691,6 +691,27 @@
       hit.setAttribute("height", "54");
       svg.appendChild(hit);
 
+      // A faint speaker above the middle of the staff while the pointer rests on it (or it has
+      // keyboard focus): fair warning that a click here makes sound.
+      cue = document.createElementNS(SVG, "g");
+      cue.setAttribute("class", "staff-cue");
+      cue.setAttribute("aria-hidden", "true");
+      // A plate of page colour behind it, so staff lines and notes don't show through.
+      var plate = document.createElementNS(SVG, "rect");
+      plate.setAttribute("x", "-2");
+      plate.setAttribute("y", "-5.5");
+      plate.setAttribute("width", "13.5");
+      plate.setAttribute("height", "11");
+      plate.setAttribute("rx", "2");
+      cue.appendChild(plate);
+      var speaker = document.createElementNS(SVG, "path");
+      speaker.setAttribute(
+        "d",
+        "M0 -1.5H1.7L4.2 -3.6V3.6L1.7 1.5H0Z M6.2 -2Q7.4 0 6.2 2 M8 -3.6Q10.4 0 8 3.6",
+      );
+      cue.appendChild(speaker);
+      svg.appendChild(cue);
+
       var clock = startAt;
       marks.forEach(function (mark) {
         var group = document.createElementNS(SVG, "g");
@@ -720,6 +741,7 @@
         clock += mark.gap === undefined ? PEN.between : mark.gap;
       });
       rendered = true;
+      placeCue(width);
 
       svg.removeAttribute("aria-hidden");
       svg.setAttribute("role", "button");
@@ -849,6 +871,22 @@
       if (moving) frame = requestAnimationFrame(glide);
     }
 
+    var cue = null;
+    // Centred above the staff: at a fixed height, or higher if a chord symbol, stem or beam
+    // underneath reaches up that far, so it never touches the music.
+    function placeCue(width) {
+      if (!cue) return;
+      var x = width / 2;
+      var top = 0;
+      drawn.forEach(function (d) {
+        for (var i = 0; i < d.to.length; i += 2) {
+          if (Math.abs(d.to[i] - x) < 10) top = Math.min(top, d.to[i + 1]);
+        }
+      });
+      var y = Math.min(-24, top - 9);
+      cue.setAttribute("transform", "translate(" + x.toFixed(1) + " " + y.toFixed(1) + ")");
+    }
+
     function reflow() {
       if (!rendered) return;
       var width = widthOf(svg);
@@ -861,6 +899,7 @@
         if (stroke.length !== drawn[i].now.length) drawn[i].now = stroke.slice();
         drawn[i].to = stroke;
       });
+      placeCue(width);
       if (!frame) frame = requestAnimationFrame(glide);
     }
 

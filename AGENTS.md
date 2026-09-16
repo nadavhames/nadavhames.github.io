@@ -322,7 +322,9 @@ chord rings. Voicings put the bass in E2–D♯3 (or the slash note) and the cho
 **Playback.** Clicking a staff (or Enter/Space when focused) plays the whole excerpt, masthead then
 footer; clicking either again stops it. Pressed before the pen is done, both staffs finish writing
 at 45× speed (`hurry`, about half a second, drawing the footer on the spot if it hasn't scrolled
-into view) and then play. The click flashes a ring that fades within a second and a half; keyboard
+into view) and then play. Resting the mouse on a staff fades in a faint speaker centred above it (`staff-cue`, on a plate
+of page colour; raised if a chord symbol or stem below reaches up, so it never touches the music), a courtesy warning that a click makes sound. It only
+appears on devices that hover, or with keyboard focus, and hides while the tune plays. The click flashes a ring that fades within a second and a half; keyboard
 focus keeps a steady ring instead. While playing, the rest of the music dims and each note rises in
 full ink as it sounds (no lift with reduced motion). When the music reaches the footer and it isn't
 fully on screen, the page scrolls to the bottom (`follow`; smooth unless reduced motion). It waits until the

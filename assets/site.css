@@ -609,6 +609,41 @@ p {
   pointer-events: all;
   cursor: pointer;
 }
+/* The speaker past the staff's end that says a click will make sound: barely there, and only
+   after the pointer has settled, so passing over the staff doesn't flicker it. Hidden while the
+   tune plays, when the music itself says so. */
+.ink .staff-cue {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+.ink .staff-cue rect {
+  fill: var(--bg);
+}
+.ink .staff-cue path {
+  fill: none;
+  stroke: var(--faint);
+  stroke-width: 0.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: none;
+  stroke-dashoffset: 0;
+  opacity: 1;
+  animation: none;
+}
+@media (hover: hover) {
+  .ink[role="button"]:hover .staff-cue {
+    opacity: 1;
+    transition-delay: 0.2s;
+  }
+}
+.ink.is-keyboard-focus .staff-cue {
+  opacity: 1;
+}
+.ink.is-performing[role="button"] .staff-cue {
+  opacity: 0;
+  transition-delay: 0s;
+}
 /* A click flashes the ring and lets it fade; keyboard focus keeps it, so tabbing shows where you are. */
 .ink[role="button"]:focus {
   outline: none;

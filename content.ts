@@ -110,7 +110,7 @@ export const tunes: Tune[] = [
     name: "Scotland the Brave",
     source: "https://thesession.org/tunes/4960",
     key: "D",
-    abc: `D2 D>E | FD FA | d2 d>d | dA FD | G2 B>G | FA FD | E2 D>C | D4`,
+    abc: `D2 D>E | FD FA | d2 d>^c | dA FD | G2 B>G | FA FD | E2 D>C | D4`,
     chords: `D | | D G | D D7 | G | D Bm | E7 A7 | D`,
     chordSource: `thesession.org/tunes/4960, setting 53645 in C, melody and chords both transposed up a tone to D`,
   },

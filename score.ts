@@ -62,7 +62,7 @@ export type Tune = {
 };
 
 /** A root (with an optional flat), a quality, and an optional bass note after "/". */
-const CHORD = /^[A-G]b?(ma7|m7|m|7|6)?(\/[A-G]b?)?$/;
+const CHORD = /^[A-G]b?(maj7|m7|m|7|6)?(\/[A-G]b?)?$/;
 
 type Note = Extract<ScoreEvent, { note: string }>;
 

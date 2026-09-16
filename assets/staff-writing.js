@@ -30,8 +30,9 @@
     accidental: 0.7,
     dot: 0.5,
   };
-  // Fixed px after marks that stick out to the right, so they keep clear however squeezed the staff.
-  var ROOM = { dot: 4, flag: 4 };
+  // Fixed px for marks that stick out sideways (a dot or flag to the right, an accidental to the
+  // left), so they keep clear however squeezed the staff.
+  var ROOM = { dot: 4, flag: 4, accidental: 5 };
   // The least px an eighth note gets. Wide staffs space purely by duration; on a squeezed one (a
   // phone) every note also gets an equal share of the room, trending toward even spacing, so all
   // four bars still fit without heads touching. Barlines and accidentals take smaller shares.
@@ -244,6 +245,7 @@
         if (e.accidental) {
           units += ADVANCE.accidental;
           shares += SHARE.accidental;
+          px += ROOM.accidental;
         }
         if (e.bar) {
           // A barline sits a third of the way back into the room before it.
@@ -570,7 +572,8 @@
         });
         Object.keys(spans).forEach(function (index) {
           var span = spans[index];
-          var top = Infinity;
+          // The staff's top line counts too, so a letter's tail (the "j" of "maj7") stays above it.
+          var top = 0.5;
           marks.forEach(function (m) {
             if (m.text) return;
             m.strokes.forEach(function (st) {
@@ -970,7 +973,7 @@
     m: [0, 3, 7],
     7: [0, 4, 7, 10],
     m7: [0, 3, 7, 10],
-    ma7: [0, 4, 7, 11],
+    maj7: [0, 4, 7, 11],
     6: [0, 4, 7, 9],
   };
 
@@ -984,7 +987,7 @@
    * don't cluster a semitone apart.
    */
   function voicing(name) {
-    var parts = name.match(/^([A-G])(b?)(ma7|m7|m|7|6)?(?:\/([A-G])(b?))?$/) || [];
+    var parts = name.match(/^([A-G])(b?)(maj7|m7|m|7|6)?(?:\/([A-G])(b?))?$/) || [];
     var root = pitchClass(parts[1] || "C", parts[2]);
     var intervals = QUALITIES[parts[3] || ""];
     if (intervals.length === 4) intervals = intervals.slice(1);

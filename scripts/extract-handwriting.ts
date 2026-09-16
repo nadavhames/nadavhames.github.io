@@ -278,19 +278,33 @@ const ascender = heightOf("l");
 const scaleText = SPACE / xHeight; // x-height of one staff space
 
 /** Baseline in sample units: descenders hang below it, so measure those from the top instead. */
-function baseline(c: string, b: ReturnType<typeof bounds>) {
-  if ("gjpqy".includes(c)) return b.y0 + xHeight;
+function baseline(c: string, b: ReturnType<typeof bounds>, strokes: Stroke[]) {
+  // A descender's body tops out at the x-height. Measure from its main stroke, not the whole
+  // letter, so the dot of a "j" doesn't count as its top.
+  if ("gjpqy".includes(c)) {
+    const main = strokes.reduce((longest, st) => (st.length > longest.length ? st : longest));
+    return bounds(main).y0 + xHeight;
+  }
   if (c === "f") return b.y0 + ascender;
   return b.y1;
 }
 
 const letters: Record<string, Letter[]> = {};
+// Letters with no ascender or descender. Some of the writer's are drawn as tall as a capital (their
+// "a" reads as "A"), so those are scaled down to the x-height.
+const SHORT = "acemnorsuvwxz";
 for (const c of "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.") {
   letters[c] = (raw[c] ?? []).map((strokes) => {
     const b = bounds(strokes.flat());
+    const shrink = SHORT.includes(c) && b.h > xHeight * 1.15 ? xHeight / b.h : 1;
+    const base = baseline(c, b, strokes);
+    // Spaced by the part on or above the baseline, so a descender's hook ("j", "g") can tuck under
+    // the letter before instead of pushing it away.
+    const above = "gjpqy".includes(c) ? strokes.flat().filter(([, y]) => y <= base) : [];
+    const x = above.length ? bounds(above) : b;
     return {
-      strokes: place(strokes, [b.x0, baseline(c, b)], scaleText),
-      width: round(b.w * scaleText),
+      strokes: place(strokes, [x.x0, base], scaleText * shrink),
+      width: round(x.w * scaleText * shrink),
     };
   });
 }

@@ -63,20 +63,21 @@ export const marginalia = {
 };
 
 /**
- * The tunes handwritten onto the two staffs, as ABC notation from thesession.org: eight bars
- * (usually the first eight), bars 1–4 written under the masthead and 5–8 in the footer. The small dots before
- * the masthead staff step through them, and a visitor's choice is remembered.
+ * The tunes handwritten onto the two staffs, as ABC notation (thesession.org, abcnotation.com):
+ * eight bars, bars 1–4 written under the masthead and 5–8 in the footer. The small dots before the
+ * masthead staff step through them, and a visitor's choice is remembered.
  *
- * All are traditional tunes in 2/4 (public domain): three Irish polkas and a Scottish pipe march.
- * They share one form, written in 4/4 with every length doubled. score.ts turns them into scores
- * and stops the build on anything it can't write. Allowed: notes A–G/a–g with ' and , for
- * octaves, lengths like 2, /, /2, rests z, accidentals ^ _ =, broken rhythms like D>E (a dotted
- * note and a short one), and spaces to break beams. Each bar must come to 2/4. No triplets, grace
- * notes, ties or chords, and every tune must end its eighth bar on a cadence, since the footer
- * closes on a final barline.
+ * All must be public domain. Most are traditional 2/4 dance tunes, written in 4/4 with every
+ * length doubled; a 4/4 tune with L:1/4 is written as it is. score.ts turns them into scores and
+ * stops the build on anything it can't write. Allowed: notes A–G/a–g with ' and , for octaves,
+ * lengths like 2, 3, /, /2, rests z (not whole or dotted), accidentals ^ _ =, ties -, broken
+ * rhythms like D>E, and spaces to break beams. Each bar must come to four units. No triplets or
+ * grace notes, and every tune must end its eighth bar on a cadence, since the footer closes on a
+ * final barline.
  *
- * `chords` are guitar chords for the same bars, written above the staffs where they change and
- * strummed as backing when it's switched on. Only use chords published with a matching setting.
+ * `chords` are written above the staffs where they change and played as backing when it's switched
+ * on. Use chords published with a matching setting; where none exist, only harmony the melody
+ * spells out plainly, and say so in `chordSource`.
  */
 export const tunes: Tune[] = [
   {
@@ -88,25 +89,6 @@ export const tunes: Tune[] = [
     chordSource: `thesession.org/tunes/85, setting 47155, whose melody matches this one note for note`,
   },
   {
-    name: "John Ryan's Polka",
-    source: "https://thesession.org/tunes/441",
-    key: "D",
-    abc: `dd B/c/d/B/ | AF ED | dd B/c/d/B/ | AF E2 | dd B/c/d/B/ | AF Ad | fd ec | d2 d2`,
-    chords: `D G | D | D G | D A | D G | D | D A | D`,
-    chordSource: `thesession.org/tunes/441, settings 28845 and 56765, which agree`,
-  },
-  {
-    name: "The Ballydesmond Polka",
-    source: "https://thesession.org/tunes/531",
-    key: "D",
-    abc: `D2 FA | dc BA | BE EF | GA/G/ FE | D2 FA | dc BA | Be Bc | d2 d2`,
-    chords: `D | | Em | A7 | D | Bm | Em A7 | D`,
-    chordSource: `thesession.org/tunes/531, setting 27994 in G, transposed down a fourth to D: its melody is this one, a fourth higher`,
-  },
-  {
-    // A Scottish pipe march rather than an Irish polka, but traditional and in 2/4 all the same.
-    // These are bars 9–16, the first strain's answering phrase, which closes on the tonic
-    // (bars 1–8 stop on a half cadence).
     name: "Scotland the Brave",
     source: "https://thesession.org/tunes/4960",
     key: "D",
@@ -115,17 +97,22 @@ export const tunes: Tune[] = [
     chordSource: `thesession.org/tunes/4960, setting 53645 in C, melody and chords both transposed up a tone to D`,
   },
   {
-    // Hoagy Carmichael and Stuart Gorrell, 1930: public domain in the US since 2026, a ballad in
-    // 4/4 rather than a tune from The Session. A simplified lead sheet, one ABC unit a quarter.
-    // These are bars 25–32, the last A section, which closes on the tonic.
     name: "Georgia on My Mind",
     source:
       "https://abcnotation.com/tunePage?a=github.com/ian-hayden/abc-music-files/abc-music-files-main.zip/abc-music-files-main/Jazz%20songs/Georgia%20on%20my%20Mind.no-ext/0000",
     key: "F",
     feel: "ballad",
     abc: `A c3 | A G3 | z A d A | F3 F/G/ | A c e d | B D A A | F4- | F2 z2`,
-    chords: `Fma7 | Em7 A7@2 | Dm7 Dm7/C@4 | Bm7 | Am7 D7@3 | Gm7 C7@3 | Fma7 | `,
-    chordSource: `the same lead sheet (Ian Hayden's collection on abcnotation.com), bars 25–32 as written, except the last bar's Gm7–C7, a turnaround back to the top, which is left out so the excerpt ends on F`,
+    chords: `Fmaj7 | Em7 A7@2 | Dm7 Dm7/C@4 | Bm7 | Am7 D7@3 | Gm7 C7@3 | Fmaj7 | `,
+    chordSource: `the same lead sheet (Ian Hayden's collection on abcnotation.com), bars 25-32 as written, except the last bar's Gm7–C7, a turnaround back to the top, which is left out so the excerpt ends on F`,
+  },
+  {
+    name: "Radetzky March",
+    source: "https://www.flutetunes.com/tunes.php?id=364",
+    key: "D",
+    abc: `F F/^E/ F F/^E/ | F E D F/^E/ | F F/^E/ F F/^E/ | F B A A/F/ | ^G f e2 | z e d2 | c3/B/ A/G/F/E/ | D D D z`,
+    chords: `D | | | | E A7@3 | D | A7/G A7@3 | D`,
+    chordSource: `the harmony of 8notes.com's piano duet arrangement (in C), transposed up a tone: D under the opening bars, E then A7 under G sharp–F sharp–E, D under E–D, A7 over G in the bass then A7 under the run down, and D`,
   },
 ];
 

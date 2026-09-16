@@ -244,14 +244,18 @@ footer's once it scrolls into view (about 21 seconds, closing on the final barli
 straight on to 5–8 in the footer, which close on a cadence at the final barline. The tunes are
 `tunes` in `content.ts`, as ABC notation:
 
-- Three Irish polkas from thesession.org (The Rakes of Mallow, John Ryan's Polka, The Ballydesmond
-  Polka), using their first eight bars.
+- The Rakes of Mallow, an Irish polka from thesession.org, using its first eight bars.
 - The Scottish pipe march Scotland the Brave, also from The Session. It uses bars 9–16, since its
   first eight stop on a half cadence.
 - Georgia on My Mind (Carmichael and Gorrell, 1930), from a simplified lead sheet on
   abcnotation.com. It is public domain in the US since 2026 but not everywhere: in life-plus-70
   countries it stays in copyright until 2052. It uses bars 25–32, the last A section, and plays as a
   ballad (`feel: "ballad"`).
+- Radetzky March (Johann Strauss I, 1848), public domain everywhere. There's no ABC of it in the
+  usual archives, so the melody was read from the MIDI of flutetunes.com's solo flute arrangement:
+  bars 13–20, the main theme's second statement, which closes on D. The flute plays it an octave
+  higher with grace notes; it is written an octave down without them. The arrangement's quarter is
+  one ABC unit, so it plays at march speed with the polka feel.
 
 - **Switching.** Faint dots just above the start of the masthead staff (`TuneSwitch`, one per tune,
   the current one lit) are a button, not a menu: each press moves to the next tune, stops any
@@ -278,21 +282,28 @@ straight on to 5–8 in the footer, which close on a cadence at the final barlin
   scale back from the staff's height and sets the svg's `viewBox`, so strokes are always laid out in
   5px-space units and a narrow staff lays out as a wider one. Spacing is by duration, but once an
   eighth would get less than `MIN_EIGHTH` (11 units) every note, barline and accidental also takes
-  an equal share of the room (`SHARE`), trending toward even spacing. Dotted notes and lone flagged
-  eighths add a few fixed units (`ROOM`), so a dot or flag never runs into the next mark. At 320px
+  an equal share of the room (`SHARE`), trending toward even spacing. Dotted notes, lone flagged
+  eighths and accidentals add a few fixed units (`ROOM`), so a dot, flag or sharp never runs into
+  the mark beside it. At 320px
   the tightest gap between marks is under 1px, with nothing touching; check that again after
   adding a busy tune.
 
 **Chords.** Each tune has chords (`chords` in `content.ts`, the source in `chordSource`): one per
 bar, two for its halves, or any number on given beats with `@` (`Em7 A7@2`). Symbols can be a root
-with an optional flat, then nothing, `m`, `7`, `m7`, `ma7` or `6`, and an optional `/bass`. The
-letters dataset has no "/", so it is drawn with a slanted barline stroke. Only published chords are
-used, checked against the melody: The Rakes of Mallow from setting 47155; John Ryan's from settings 28845 and
-56765, which agree (46677's G under bar 2 clashes with the melody, so it isn't used); The
-Ballydesmond from setting 27994, which is the same melody in G, transposed down to D; Scotland the
-Brave from setting 53645 in C, melody and chords both transposed up a tone to D; Georgia on My
-Mind from the same lead sheet as its melody, leaving out the last bar's Gm7–C7 turnaround so it
-ends on F. `score.ts` places each chord at the note (or rest) starting on its beat and writes a symbol only where the
+with an optional flat, then nothing, `m`, `7`, `m7`, `maj7` or `6`, and an optional `/bass`. The
+letters dataset has no "/", so it is drawn with a slanted barline stroke. The writer drew some small letters as tall
+as capitals (their "a" read as "A"), so the extractor scales those to the x-height, and spaces
+descender letters by their part above the baseline so a "j" tucks in, with each descender's main stroke
+(not a "j"'s dot) topping out at the x-height. A chord symbol also lifts
+clear of the top staff line, so a descender never touches it. Published chords are used
+where they exist, checked against the melody: The Rakes of Mallow from setting 47155; Scotland the
+Brave from setting 53645 in C, melody and chords both transposed up a tone to D; Georgia on My Mind
+from the same lead sheet as its melody, leaving out the last bar's Gm7–C7 turnaround so it ends on
+F. The Radetzky March's chords come from the piano duet
+arrangement on 8notes.com, read from its MIDI and moved up a tone from C: E then A7 under
+G sharp–F sharp–E, D under E–D (not A7: the D would clash with the chord's C sharp), A7 over G in
+the bass then A7 under the run down. Where no chords are published at all, use only harmony the
+melody spells plainly, and say so in `chordSource`. `score.ts` places each chord at the note (or rest) starting on its beat and writes a symbol only where the
 chord changes, just above the staff (30% larger than other text). `clearChords` lifts a symbol
 only as far as a high stem, beam or slur under it needs (3px clearance). Tempo text such as _rit._
 also belongs above the staff, so where it shares a note with a chord it stacks above the symbol
@@ -318,7 +329,7 @@ fully on screen, the page scrolls to the bottom (`follow`; smooth unless reduced
 masthead's last note has finished, so that note is seen playing. No recording exists for these settings, so
 the piano is synthesised with Web Audio in `assets/staff-writing.js`: a filtered-noise hammer over
 slightly stretched overtones that fade faster the higher they are. Pitches come from the score (key
-signature and accidentals included); `FEELS` sets each feel's tempo (0.3 s a quarter for polkas, 0.8 s for the ballad) and `RIT` how far the notes after
+signature and accidentals included); `FEELS` sets each feel's tempo (0.3 s a quarter for the polka and marches, 0.8 s for the ballad) and `RIT` how far the notes after
 _rit._ ease out. Only a note's own marks light up (head, stem, accidental, ledger). Labels are
 `labels.playExcerpt` / `labels.stopExcerpt` / `labels.nextTune`, with `{tune}` filled in.
 

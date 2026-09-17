@@ -169,7 +169,7 @@ export const work = [
     when: "2020 - 2021",
     where: "Toronto, ON",
     body: `
-      Built the SPAs making up client-facing platform for a suite of GIS solutions, and the
+      Built client-facing SPAs for a suite of GIS solutions, and the
       data integrations connecting it to enterprise customers.
     `,
     stack: ["React", ".NET Core", "Node.js", "MongoDB", "SQL Server"],
@@ -189,14 +189,14 @@ export const projects = [
   {
     name: "Perms DSL",
     meta: "TypeScript · LSP",
-    body: "A domain-specific language and language server generating type-safe code for user permissions. Built and used by Scorewright.",
+    body: "A domain-specific language and language server generating type-safe code for user permissions. Built and used for Scorewright.",
   },
   {
     name: "Algorithmics Animation Workshop",
     href: "https://www.eecs.yorku.ca/~aaw/",
     meta: "d3.js · TS",
     body: `
-      A platform for building visualizations of algorithms and data structures for teaching,
+      A learning platform for building and viewing visualizations of algorithms and data structures,
       hosted by York University's EECS department. With [Jay Karon](https://jaykaron.github.io/).
     `,
   },
@@ -211,7 +211,7 @@ export const projects = [
   {
     name: "Othello",
     href: "/Othello/menu.html",
-    meta: "JavaScript",
+    meta: "JavaScript · PeerJS",
     body: "Playable in the browser - offline against the computer, or online P2P against a friend.",
   },
   {

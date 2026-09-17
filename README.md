@@ -12,5 +12,3 @@ bun run format     # Prettier
 - **Deploy** by pushing to `master`.
 - **Update the résumé** by replacing `Nadav-Hames-Resume.pdf`, or run **Actions → import resume**
   to pull it from FlowCV.
-
-How everything works is in [AGENTS.md](AGENTS.md).
